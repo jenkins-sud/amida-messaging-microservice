@@ -1,6 +1,6 @@
 {
   "name": "amida-messaging-microservice",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Microservice for a lightweight messaging application",
   "author": "Jacob Sachs <jacob@amida.com>",
   "main": "index.js",

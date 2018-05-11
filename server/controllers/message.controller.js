@@ -20,7 +20,7 @@ function load(req, res, next, id) {
         .findById(id)
         .then((message) => {
             if (!message) {
-                const err = new APIError('Message does not exist', httpStatus.NOT_FOUND, true);
+                const err = new APIError('Message does not exist', 'MESSAGE_NOT_EXIST', httpStatus.NOT_FOUND, true);
                 return next(err);
             }
             req.message = message; // eslint-disable-line no-param-reassign
@@ -99,7 +99,7 @@ function reply(req, res, next) {
         return false;
     }
     if (!isValidReply()) {
-        const err = new APIError('Cannot reply to a message not sent to you!', httpStatus.FORBIDDEN, true);
+        const err = new APIError('Cannot reply to a message not sent to you!', 'CANNOT_REPLY_NO_ACCESS', httpStatus.FORBIDDEN, true);
         return next(err);
     }
     // Then, generate messages a la send()

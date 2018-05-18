@@ -76,7 +76,6 @@ module.exports = (sequelize, DataTypes) => {
             },
         },
     });
-
     // Class methods
 
     return Message;

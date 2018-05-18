@@ -2,6 +2,7 @@ import express from 'express';
 
 import messageRoutes from './message.route';
 import threadRoutes from './thread.route';
+import threadsRoutes from './threads.route';
 import p from '../../package';
 
 const router = express.Router(); // eslint-disable-line new-cap
@@ -16,5 +17,6 @@ router.get('/health-check', (req, res) =>
 // mount message routes at /message
 router.use(`${baseURL}/message`, messageRoutes);
 router.use(`${baseURL}/thread`, threadRoutes);
+router.use(`${baseURL}/threads`, threadsRoutes);
 
 export default router;

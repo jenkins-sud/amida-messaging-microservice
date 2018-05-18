@@ -10,7 +10,6 @@ const Message = db.Message;
 const messageScope = function messageScope(req) {
     return Message.scope({ method: ['forUser', req.user] });
 };
-
 /**
  * Load message and append to req.
  * Message cannot be deleted or archived.

@@ -3,6 +3,7 @@ import Promise from 'bluebird';
 import db from '../../config/sequelize';
 import APIError from '../helpers/APIError';
 import Sequelize from 'sequelize';
+import notificationHelper from '../helpers/notificationHelper'
 
 const Message = db.Message;
 const Thread = db.Thread;
@@ -62,11 +63,20 @@ function create(req, res, next) {
             addUserMessagePromises.push(addUserMessagePromise);
           });
           Promise.all(addUserMessagePromises).then(() => {
+            const pushNotificationArray = [];
             users.forEach((user) => {
               if(user.username !== sender.username) {
-                user.sendPushNotification({notificationType: 'New Message', message});
+                const pushNotificationData = {
+                  username: user.username,
+                  data: {
+                    notificationType: 'New Message',
+                    message
+                  }
+                };
+                pushNotificationArray.push(pushNotificationData);
               }
             });
+            notificationHelper.sendPushNotifications(pushNotificationArray);
             res.send({message});
           })
         })

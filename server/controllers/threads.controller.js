@@ -62,7 +62,12 @@ function create(req, res, next) {
             addUserMessagePromises.push(addUserMessagePromise);
           });
           Promise.all(addUserMessagePromises).then(() => {
-            res.send({message})
+            users.forEach((user) => {
+              if(user.username !== sender.username) {
+                user.sendPushNotification({notificationType: 'New Message', message});
+              }
+            });
+            res.send({message});
           })
         })
       });

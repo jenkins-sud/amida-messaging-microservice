@@ -68,9 +68,10 @@ function create(req, res, next) {
               if(user.username !== sender.username) {
                 const pushNotificationData = {
                   username: user.username,
+                  notificationType: 'New Message',
                   data: {
-                    notificationType: 'New Message',
-                    message
+                    title: `${sender.username} sent you a message`,
+                    body: message.message,
                   }
                 };
                 pushNotificationArray.push(pushNotificationData);

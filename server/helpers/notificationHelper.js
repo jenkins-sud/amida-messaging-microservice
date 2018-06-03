@@ -16,7 +16,7 @@ function sendPushNotifications(pushData) {
           headers: {"Content-Type": "application/json", "Authorization":"Bearer " + token},
           data: {pushData},
       };
-      client.post(`${config.notificationMicroservice}/users/sendPushNotification`, pushNotificationArgs, function (data, response) {
+      client.post(`${config.notificationMicroservice}/notifications/sendPushNotifications`, pushNotificationArgs, function (data, response) {
       });
   });
 }

@@ -22,7 +22,34 @@ const sequelize = new Sequelize(config.postgres.db,
         logging: dbLogging,
     });
 
-db.Message = sequelize.import('../server/models/message.model');
+const Message = sequelize.import('../server/models/message.model');
+const User = sequelize.import('../server/models/user.model');
+const Thread = sequelize.import('../server/models/thread.model');
+const UserMessage = sequelize.import('../server/models/userMessage.model');
+const UserThread = sequelize.import('../server/models/userThread.model');
+
+// Threads
+Thread.hasMany(Message);
+Thread.hasOne(Message, {as: 'LastMessage'});
+Thread.belongsToMany(User, {through: 'UserThread'});
+
+// Messages
+Message.belongsTo(Thread)
+Message.belongsTo(User, {as: 'Sender'})
+Message.belongsToMany(User, {through: 'UserMessage'});
+
+// Users
+User.belongsToMany(Thread, {through: 'UserThread'});
+User.belongsToMany(Message, {through: 'UserMessage'})
+
+
+
+
+db.Message = Message;
+db.Thread = Thread;
+db.User = User;
+db.UserMessage = UserMessage;
+db.UserThread = UserThread;
 
 // assign the sequelize variables to the db object and returning the db.
 module.exports = _.extend({

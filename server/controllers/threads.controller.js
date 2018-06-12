@@ -191,8 +191,12 @@ function show(req, res, next) {
  */
 function index(req, res, next) {
   const { username } = req.user;
-  User.findOne({
-    where: {username}
+  User.findAll({
+      where: {
+        username: {
+          [Op.in]: username.split(',')
+        }
+      }
     })
     .then((user) => {
       if (!user) {

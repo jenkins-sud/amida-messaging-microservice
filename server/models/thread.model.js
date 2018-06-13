@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        lastMessageId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
         lastMessageSent: {
             type: DataTypes.DATE,
             allowNull: true,

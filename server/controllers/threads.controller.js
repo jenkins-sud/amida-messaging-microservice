@@ -75,6 +75,9 @@ function create(req, res, next) {
           // the message as alternative to calling the methods below to save the extra db operation
           // thread.addMessage(message);
           // thread.setLastMessage(message); EG
+          thread.update({
+            lastMessageId: message.id
+          });
           let addUserMessagePromises = [];
           users.forEach((user) => {
             let addUserMessagePromise = user.addMessage(message).then(() => {
@@ -117,7 +120,8 @@ function reply(req, res, next) {
           thread.addMessage(message);
           thread.setLastMessage(message);
           thread.update({
-            lastMessageSent: date
+            lastMessageSent: date,
+            lastMessageId: message.id
           }).then(() => {});
           UserThread.update({
             lastMessageRead: false,
@@ -191,9 +195,11 @@ function show(req, res, next) {
  * @returns {User}
  */
 function index(req, res, next) {
-
+  const { username } = req.user;
   const { logUsername } = req.query;
-  console.log('USER IS ', logUsername)
+
+  //console.log('USER IS ', logUsername)
+  
   User.findOne({
     where: {username: logUsername}
     })

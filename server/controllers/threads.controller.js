@@ -9,6 +9,7 @@ const Message = db.Message;
 const Thread = db.Thread;
 const User = db.User;
 const UserThread = db.UserThread;
+const sequelize = db.sequelize;
 const Op = Sequelize.Op;
 
 function notifyUsers(users, sender, message) {
@@ -30,7 +31,7 @@ function notifyUsers(users, sender, message) {
 }
 
 /**
- * Start a new thread
+ * Start  a new thread
  * @property {Array} req.body.participants - Array of usernames to include in the thread.
  * @property {string} req.body.subject - Subject line of the message
  * @property {string} req.body.message - Body of the message
@@ -190,13 +191,11 @@ function show(req, res, next) {
  * @returns {User}
  */
 function index(req, res, next) {
-  const { username } = req.user;
-  User.findAll({
-      where: {
-        username: {
-          [Op.in]: username.split(',')
-        }
-      }
+
+  const { logUsername } = req.query;
+  console.log('USER IS ', logUsername)
+  User.findOne({
+    where: {username: logUsername}
     })
     .then((user) => {
       if (!user) {
@@ -218,6 +217,16 @@ function index(req, res, next) {
       })
     })
     .catch(e => next(e));
+}
+
+function getUserLog(req, res, next) {
+  const { username } = req.user;
+
+  sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as B on A."id" = B."UserId" inner join "UserThreads" as C on C."ThreadId" = B."ThreadId" and B."UserId" != C."UserId" inner join "Users" as D on C."UserId" = D."id" inner join "Threads" as E on B."ThreadId" = E."id" Where D.username = :username and A.username = :logUsername',
+    { replacements: { username: username, logUsername: logUsername, }, type: sequelize.QueryTypes.SELECT
+  }).then(logData => {
+      res.send(logData)
+  })
 }
 
 export default {

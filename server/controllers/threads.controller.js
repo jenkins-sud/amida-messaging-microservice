@@ -198,41 +198,75 @@ function index(req, res, next) {
   const { username } = req.user;
   const { logUsername } = req.query;
 
-  //console.log('USER IS ', logUsername)
-  
-  User.findOne({
-    where: {username: logUsername}
-    })
-    .then((user) => {
-      if (!user) {
+
+  if( username === logUsername ) {
+    // User.findOne({
+    //   where: {username: logUsername}
+    //   })
+    //   .then((user) => {
+    //     if (!user) {
+    //         const err = new APIError('There are no threads for the current user', httpStatus.NOT_FOUND, true);
+    //         return next(err);
+    //     }
+    //     user.getThreads({
+    //       include:[{
+    //         model: Message,
+    //         as: 'LastMessage',
+    //         include: [{
+    //           association: 'Sender'
+    //         }]
+    //       }],
+    //       order: [
+    //       ['lastMessageSent', 'DESC']]
+    //     }).then(threads => {
+    //
+    //       res.send(threads)
+    //     })
+    //   })
+    sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "Threads" as E on UserThread."ThreadId" = E."id" inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username Order By "lastMessageSent" DESC',
+      { replacements: { username: username }, type: sequelize.QueryTypes.SELECT
+    }).then(logData => {
+      if (!logData) {
           const err = new APIError('There are no threads for the current user', httpStatus.NOT_FOUND, true);
           return next(err);
       }
-      user.getThreads({
-        include:[{
-          model: Message,
-          as: 'LastMessage',
-          include: [{
-            association: 'Sender'
-          }]
-        }],
-        order: [
-        ['lastMessageSent', 'DESC']]
-      }).then(threads => {
-        res.send(threads)
-      })
+        res.send(logData)
     })
     .catch(e => next(e));
-}
+  } else {
+    sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "UserThreads" as C on C."ThreadId" = UserThread."ThreadId" and UserThread."UserId" != C."UserId" inner join "Users" as D on C."UserId" = D."id" inner join "Threads" as E on UserThread."ThreadId" = E."id" inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username and  D.username = :logUsername Order By "lastMessageSent" DESC',
+      { replacements: { username: username, logUsername: logUsername }, type: sequelize.QueryTypes.SELECT
+    }).then(logData => {
+      if (!logData) {
+          const err = new APIError('There are no threads for the current user', httpStatus.NOT_FOUND, true);
+          return next(err);
+      }
+        res.send(logData)
+    })
+    .catch(e => next(e));
 
-function getUserLog(req, res, next) {
-  const { username } = req.user;
+    // User.findAll({
+    //   include:[{
+    //     model: UserThread,
+    //     include:[{
+    //       model: Thread,
+    //       on: {
+    //            col1: sequelize.where(sequelize.col("UserThread.ThreadId"), "=", sequelize.col("Thread.Id")),
+    //        },
+    //
+    //     }],
+    //   }],
+    //
+    //   where: {username: logUsername}
+    //
+    // }).then(threads => {
+    //   console.log('This is called!')
+    //   console.log(threads)
+    //   res.send(threads)
+    // })
 
-  sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as B on A."id" = B."UserId" inner join "UserThreads" as C on C."ThreadId" = B."ThreadId" and B."UserId" != C."UserId" inner join "Users" as D on C."UserId" = D."id" inner join "Threads" as E on B."ThreadId" = E."id" Where D.username = :username and A.username = :logUsername',
-    { replacements: { username: username, logUsername: logUsername, }, type: sequelize.QueryTypes.SELECT
-  }).then(logData => {
-      res.send(logData)
-  })
+
+  }
 }
 
 export default {

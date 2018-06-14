@@ -234,7 +234,7 @@ function index(req, res, next) {
     })
     .catch(e => next(e));
   } else {
-    sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "UserThreads" as C on C."ThreadId" = UserThread."ThreadId" and UserThread."UserId" != C."UserId" inner join "Users" as D on C."UserId" = D."id" inner join "Threads" as E on UserThread."ThreadId" = E."id" inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username and  D.username = :logUsername Order By "lastMessageSent" DESC',
+    sequelize.query('SELECT A.*, UserThread.*, E.*, LastMessage.*   FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "UserThreads" as C on C."ThreadId" = UserThread."ThreadId" and UserThread."UserId" != C."UserId" inner join "Users" as D on C."UserId" = D."id" inner join "Threads" as E on UserThread."ThreadId" = E."id" inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username and  D.username = :logUsername Order By "lastMessageSent" DESC',
       { replacements: { username: username, logUsername: logUsername }, type: sequelize.QueryTypes.SELECT
     }).then(logData => {
       if (!logData) {

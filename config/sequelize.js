@@ -42,7 +42,7 @@ Message.belongsToMany(User, {through: 'UserMessage'});
 User.belongsToMany(Thread, {through: 'UserThread'});
 User.belongsToMany(Message, {through: 'UserMessage'})
 
-
+User.hasMany(UserThread);
 
 
 db.Message = Message;

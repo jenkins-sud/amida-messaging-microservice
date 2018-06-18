@@ -19,4 +19,7 @@ router.route('/thread/:threadId/reply')
 router.route('/thread/:threadId')
     .get(threadsCtrl.show);
 
+router.route('/thread/participants/:threadId')
+    .get(threadsCtrl.participants);
+
 export default router;

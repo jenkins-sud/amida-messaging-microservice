@@ -190,6 +190,7 @@ function show(req, res, next) {
     .catch(e => next(e));
 }
 
+
 /**
  * Returns a the current user and a list of the current user's threads
  * @returns {User}
@@ -200,29 +201,6 @@ function index(req, res, next) {
 
 
   if( username === logUsername ) {
-    // User.findOne({
-    //   where: {username: logUsername}
-    //   })
-    //   .then((user) => {
-    //     if (!user) {
-    //         const err = new APIError('There are no threads for the current user', httpStatus.NOT_FOUND, true);
-    //         return next(err);
-    //     }
-    //     user.getThreads({
-    //       include:[{
-    //         model: Message,
-    //         as: 'LastMessage',
-    //         include: [{
-    //           association: 'Sender'
-    //         }]
-    //       }],
-    //       order: [
-    //       ['lastMessageSent', 'DESC']]
-    //     }).then(threads => {
-    //
-    //       res.send(threads)
-    //     })
-    //   })
     sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "Threads" as E on UserThread."ThreadId" = E."id" inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username Order By "lastMessageSent" DESC',
       { replacements: { username: username }, type: sequelize.QueryTypes.SELECT
     }).then(logData => {
@@ -244,34 +222,31 @@ function index(req, res, next) {
         res.send(logData)
     })
     .catch(e => next(e));
-
-    // User.findAll({
-    //   include:[{
-    //     model: UserThread,
-    //     include:[{
-    //       model: Thread,
-    //       on: {
-    //            col1: sequelize.where(sequelize.col("UserThread.ThreadId"), "=", sequelize.col("Thread.Id")),
-    //        },
-    //
-    //     }],
-    //   }],
-    //
-    //   where: {username: logUsername}
-    //
-    // }).then(threads => {
-    //   console.log('This is called!')
-    //   console.log(threads)
-    //   res.send(threads)
-    // })
-
-
   }
+}
+
+function participants(req, res, next) {
+  const { threadId } = req.params;
+  User.findAll({
+
+    include: [{
+      model: UserThread,
+      required: true,
+      where: {
+        ThreadId: threadId
+
+      }
+    }],
+
+  }).then(users => {
+    res.send(users)
+  })
 }
 
 export default {
     create,
     reply,
     show,
+    participants,
     index
 };

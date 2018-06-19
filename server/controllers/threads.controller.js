@@ -41,12 +41,26 @@ function notifyUsers(users, sender, message) {
 function create(req, res, next) {
     const { username } = req.user;
     const participants = req.body.participants;
+    const isLog = req.body.isLog;
     let users = [];
     let userPromises = [];
     let date = new Date();
+    let ThreadId = null;
+    let UserId = null;
+
+    console.log('Is log?!', req.body)
+
+    //Error message if blank array is sent to API
+    if (participants === undefined || participants.length == 0 ) {
+        const err = new APIError('There are no participants to create a thread', httpStatus.NOT_FOUND, true);
+        return next(err);
+    }
+
     participants.forEach((participant) => {
       let userPromise = User.findOrCreate({where: {username: participant}})
       .spread((user, created) => {
+        if(user.email = username)
+          UserId = user.id
         users.push(user);
       });
       userPromises.push(userPromise);
@@ -57,11 +71,13 @@ function create(req, res, next) {
         topic: req.body.topic,
         lastMessageSent: date
       }).then((thread) => {
+        ThreadId = thread.id
         thread.setUsers(users);
         const sender = users.find(sender => {
           return sender.username === username;
         })
         Message.create({
+
           from: username,
           to: [],
           owner: '',
@@ -75,21 +91,38 @@ function create(req, res, next) {
           // the message as alternative to calling the methods below to save the extra db operation
           // thread.addMessage(message);
           // thread.setLastMessage(message); EG
-          thread.update({
-            lastMessageId: message.id
-          });
+
           let addUserMessagePromises = [];
           users.forEach((user) => {
             let addUserMessagePromise = user.addMessage(message).then(() => {
             });
             addUserMessagePromises.push(addUserMessagePromise);
           });
+
+
+
+
           Promise.all(addUserMessagePromises).then(() => {
             notifyUsers(users, sender, message);
             res.send({message});
           })
         })
-      });
+
+
+      })
+
+      //If user is creating a log thread
+      console.log('Is this a log...?',isLog)
+      if(isLog){
+        console.log('DOES THIS EVER HAPPEN?')
+        UserThread.update({
+          isLog: true
+        }, {
+          where: {
+            UserId, ThreadId
+          }
+        });
+      }
     })
 }
 
@@ -225,19 +258,23 @@ function index(req, res, next) {
   }
 }
 
+//Find all users in a threadid, not including self
 function participants(req, res, next) {
+  const { username } = req.user;
   const { threadId } = req.params;
   User.findAll({
-
     include: [{
       model: UserThread,
       required: true,
       where: {
-        ThreadId: threadId
-
+        ThreadId: threadId,
       }
     }],
-
+    where: {
+      username: {
+        [Op.ne]: username
+      }
+    }
   }).then(users => {
     res.send(users)
   })

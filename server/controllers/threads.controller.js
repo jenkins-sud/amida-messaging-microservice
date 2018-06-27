@@ -57,7 +57,7 @@ function create(req, res, next) {
     participants.forEach((participant) => {
       let userPromise = User.findOrCreate({where: {username: participant}})
       .spread((user, created) => {
-        if(user.username = username)
+        if(user.username === username)
           UserId = user.id
         users.push(user);
       });
@@ -85,7 +85,7 @@ function create(req, res, next) {
           ThreadId: thread.id,
           LastMessageId: thread.id //adding this while creating is okay as this is the first message in thread
         }).then((message) => {
-          ThreadId = thread.id
+
 
           //Get lastMessageId added to Thread
           Thread.update({
@@ -98,16 +98,22 @@ function create(req, res, next) {
           //If user is creating a log thread
           if(isLog){
             UserThread.update({
-              isLog: true
+              isLog: true,
+              lastMessageRead: true
+            }, {
+              where: {
+                UserId, ThreadId
+              }
+            });
+          } else {
+            UserThread.update({
+              lastMessageRead: true
             }, {
               where: {
                 UserId, ThreadId
               }
             });
           }
-
-
-
 
           // I simply passed the LastMessageId and ThreadId properties while creating
           // the message as alternative to calling the methods below to save the extra db operation

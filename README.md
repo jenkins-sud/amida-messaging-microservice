@@ -60,7 +60,7 @@ Create the database:
 When you `yarn start` the first time, a script will automatically create the database schema. However, this will only work if your postgres instance has:
 
 1. A database matching your `.env` file's `PG_DB` name
-2. A user matching your `.env` file's `PG_USER` name, which has sufficient permissions to modify.
+2. A user matching your `.env` file's `PG_USER` name, which has sufficient permissions to modify your `PG_DB`.
 
 Therefore, in your Postgres instance, create that user and database now.
 

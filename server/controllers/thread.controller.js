@@ -14,7 +14,7 @@ function get(req, res, next) {
         })
         .then((messages) => {
             if (messages.length === 0) {
-                const err = new APIError('Original message does not exist', httpStatus.NOT_FOUND, true);
+                const err = new APIError('Original message does not exist', 'MESSAGE_NOT_EXIST', httpStatus.NOT_FOUND, true);
                 next(err);
             } else {
                 res.send(messages);

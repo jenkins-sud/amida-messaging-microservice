@@ -31,6 +31,13 @@ Merge the resulting changes to the `gh-pages` branch of the repository.
 
 ## Developing locally
 
+### Versions
+
+`yarn start` fails if your Node.js version is v10.4.1. Exactly all of the Node.js versions that fail in this way are unknown.
+
+Node.js v8.11.1 is known to work.
+
+
 Install yarn:
 ```js
 npm install -g yarn
@@ -45,6 +52,17 @@ Set environment vars:
 ```sh
 cp .env.example .env
 ```
+
+In .env, specify the enviroment variables you need.
+
+Create the database:
+
+When you `yarn start` the first time, a script will automatically create the database schema. However, this will only work if your postgres instance has:
+
+1. A database matching your `.env` file's `PG_DB` name
+2. A user matching your `.env` file's `PG_USER` name, which has sufficient permissions to modify.
+
+Therefore, in your Postgres instance, create that user and database now.
 
 Start server:
 ```sh

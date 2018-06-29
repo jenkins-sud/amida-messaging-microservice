@@ -1,5 +1,51 @@
 # Amida Messaging Microservice
 
+## Environment Variables (Grouped by Purpose)
+
+Note: Default values are in parenthesis.
+
+### This Server:
+
+`NODE_ENV` (`=development`)
+- When in development, set to `development`
+
+`PORT` (`=4001`) The port this server will run on.
+- When in development, by default set to `4001`, because other Amida microservices run, by default, on other `400x` ports.
+
+### This Microservice's Postgres Instance:
+
+`PG_DB` (`=amida_messaging_microservice`) Postgres database name.
+- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
+
+`PG_PORT` (`=5432`) Port on the machine the postgres instance is running on.
+
+`PG_HOST` (`=localhost`) Hostname of machine the postgres instance is running on.
+- When doing docker, set to the name of the docker container running postgres. Setting to `amida_messaging_microservice_db` is recommended.
+
+`PG_USER` (`=amida_messaging_microservice`) Postgres user that will perform operations on behalf of this microservice. Therefore, this user must have permissions to modify the database specified by `PG_DB`.
+- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
+
+`PG_PASSWD` (N/A) Password of postgres user `PG_USER`.
+
+### Running the Automated Test Suite:
+
+`TEST_TOKEN` (`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo`) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
+
+### Integration With Amida Auth Microservice:
+
+`JWT_SECRET` (`=0a6b944d-d2fb-46fc-a85e-0295c986cd9f`) Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
+- See that repo for details.
+
+`AUTH_MICROSERVICE` (`=http://localhost:4000/api`) Url of the Amida Auth Microservice API.
+
+`MICROSERVICE_ACCESS_KEY` (Stored in the password vault) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
+
+`MICROSERVICE_PASSWORD` (`=@TestTest1`) The password of the user specified by `MICROSERVICE_ACCESS_KEY`.
+- In production, set to a different value.
+
+### Integration With Amida Notification Microservice
+
+`NOTIFICATION_MICROSERVICE` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
 
 ## Design
 

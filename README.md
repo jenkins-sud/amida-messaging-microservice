@@ -38,7 +38,8 @@ Note: Default values are in parenthesis.
 
 `AUTH_MICROSERVICE` (`=http://localhost:4000/api`) Url of the Amida Auth Microservice API.
 
-`MICROSERVICE_ACCESS_KEY` (Stored in the password vault) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
+`MICROSERVICE_ACCESS_KEY` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
+- The default value is for development only. In production, set this to a different value.
 
 `MICROSERVICE_PASSWORD` (`=@TestTest1`) The password of the user specified by `MICROSERVICE_ACCESS_KEY`.
 - In production, set to a different value.

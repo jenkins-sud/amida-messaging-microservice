@@ -140,6 +140,12 @@ Docker Compose:
 docker-compose up
 ```
 
+### Enabling Push Notifications with the Notifications Microservice
+  - Set up and start the [Amida Notification Microservice](https://github.com/amida-tech/amida-notification-microservice)
+  - Set the `NOTIFICATION_MICROSERVICE` value in the `.env` file to the url for the notification microservice service
+  - If you haven't already, create a `microservice user` on the Auth Service with username and password matching your `MICROSERVICE_ACCESS_KEY` and `MICROSERVICE_PASSWORD` values respectively in the `.env` file. Ensure that the `MICROSERVICE_ACCESS_KEY` value matches the `MICROSERVICE_ACCESS_KEY` value in the `.env` file for the Notification Microservice.
+  - Set the `ENABLE_PUSH_NOTIFICATIONS` option to true in your `.env` file
+
 ### Kubernetes Deployment
 See the [paper](https://paper.dropbox.com/doc/Amida-Microservices-Kubernetes-Deployment-Xsz32zX8nwT9qctitGNVc) write-up for instructions on how to deploy with Kubernetes. The `kubernetes.yml` file contains the deployment definition for the project.
 

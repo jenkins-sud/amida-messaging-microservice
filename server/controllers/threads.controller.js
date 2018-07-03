@@ -41,12 +41,13 @@ function notifyUsers(users, sender, message) {
 function create(req, res, next) {
     const { username } = req.user;
     const participants = req.body.participants;
-    const isLog = req.body.isLog;
+    const logUser = req.body.logUser;
     let users = [];
     let userPromises = [];
     let date = new Date();
     let ThreadId = null;
     let UserId = null;
+    let logUserId = null;
 
     //Error message if blank array is sent to API
     if (participants === undefined || participants.length == 0 ) {
@@ -59,6 +60,9 @@ function create(req, res, next) {
       .spread((user, created) => {
         if(user.username === username)
           UserId = user.id
+        if(logUser && user.username === logUser)
+          logUserId = user.id
+
         users.push(user);
       });
       userPromises.push(userPromise);
@@ -67,7 +71,8 @@ function create(req, res, next) {
     Promise.all(userPromises).then(() => {
       Thread.create({
         topic: req.body.topic,
-        lastMessageSent: date
+        lastMessageSent: date,
+        logUserId
       }).then((thread) => {
         thread.setUsers(users);
         const sender = users.find(sender => {
@@ -86,7 +91,6 @@ function create(req, res, next) {
           LastMessageId: thread.id //adding this while creating is okay as this is the first message in thread
         }).then((message) => {
 
-
           //Get lastMessageId added to Thread
           Thread.update({
             lastMessageId: message.id
@@ -94,26 +98,14 @@ function create(req, res, next) {
             where: { id: ThreadId }
           });
 
+          UserThread.update({
+            lastMessageRead: true
+          }, {
+            where: {
+              UserId, ThreadId
+            }
+          });
 
-          //If user is creating a log thread
-          if(isLog){
-            UserThread.update({
-              isLog: true,
-              lastMessageRead: true
-            }, {
-              where: {
-                UserId, ThreadId
-              }
-            });
-          } else {
-            UserThread.update({
-              lastMessageRead: true
-            }, {
-              where: {
-                UserId, ThreadId
-              }
-            });
-          }
 
           // I simply passed the LastMessageId and ThreadId properties while creating
           // the message as alternative to calling the methods below to save the extra db operation
@@ -244,7 +236,7 @@ function index(req, res, next) {
 
 
   if( username === logUsername ) {
-    sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "Threads" as E on UserThread."ThreadId" = E."id" and UserThread."isLog" = false inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username Order By "lastMessageSent" DESC',
+    sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "Threads" as E on UserThread."ThreadId" = E."id" and (E."logUserId" = A."id" OR E."logUserId" is null ) inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username Order By "lastMessageSent" DESC',
       { replacements: { username: username }, type: sequelize.QueryTypes.SELECT
     }).then(logData => {
       if (!logData) {
@@ -255,7 +247,7 @@ function index(req, res, next) {
     })
     .catch(e => next(e));
   } else {
-    sequelize.query('SELECT A.*, UserThread.*, E.*, LastMessage.*   FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" and UserThread."isLog" = true inner join "UserThreads" as C on C."ThreadId" = UserThread."ThreadId" and UserThread."UserId" != C."UserId"  inner join "Users" as D on C."UserId" = D."id" inner join "Threads" as E on UserThread."ThreadId" = E."id" inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username and  D.username = :logUsername Order By "lastMessageSent" DESC',
+    sequelize.query('SELECT A.*, UserThread.*, E.*, LastMessage.* FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "Threads" as E on UserThread."ThreadId" = E."id" inner join "Users" as D on E."logUserId" = D."id" inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id"  Where A.username = :username and  D.username = :logUsername Order By "lastMessageSent" DESC',
       { replacements: { username: username, logUsername: logUsername }, type: sequelize.QueryTypes.SELECT
     }).then(logData => {
       if (!logData) {

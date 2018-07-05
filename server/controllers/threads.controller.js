@@ -3,12 +3,31 @@ import Promise from 'bluebird';
 import db from '../../config/sequelize';
 import APIError from '../helpers/APIError';
 import Sequelize from 'sequelize';
+import notificationHelper from '../helpers/notificationHelper'
 
 const Message = db.Message;
 const Thread = db.Thread;
 const User = db.User;
 const UserThread = db.UserThread;
 const Op = Sequelize.Op;
+
+function notifyUsers(users, sender, message) {
+  const pushNotificationArray = [];
+  users.forEach((user) => {
+    if(user.username !== sender.username) {
+      const pushNotificationData = {
+        username: user.username,
+        notificationType: 'New Message',
+        data: {
+          title: `${sender.username} sent you a message`,
+          body: message.message,
+        }
+      };
+      pushNotificationArray.push(pushNotificationData);
+    }
+  });
+  notificationHelper.sendPushNotifications(pushNotificationArray);
+}
 
 /**
  * Start a new thread
@@ -62,7 +81,8 @@ function create(req, res, next) {
             addUserMessagePromises.push(addUserMessagePromise);
           });
           Promise.all(addUserMessagePromises).then(() => {
-            res.send({message})
+            notifyUsers(users, sender, message);
+            res.send({message});
           })
         })
       });
@@ -117,6 +137,7 @@ function reply(req, res, next) {
               addUserMessagePromises.push(addUserMessagePromise);
             });
             Promise.all(addUserMessagePromises).then(() => {
+              notifyUsers(users, currentUser, message);
               res.send({message})
             })
           })

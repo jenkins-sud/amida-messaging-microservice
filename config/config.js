@@ -23,6 +23,16 @@ const envVarsSchema = Joi.object({
         .description('Postgres password'),
     TEST_TOKEN: Joi.string().allow('')
         .description('Test auth token'),
+    AUTH_MICROSERVICE: Joi.string().allow('')
+        .description('Auth microservice endpoint'),
+    NOTIFICATION_MICROSERVICE: Joi.string().allow('')
+        .description('Notification Microservice endpoint'),
+    MICROSERVICE_ACCESS_KEY: Joi.string().allow('')
+        .description('Microservice Access Key'),
+    MICROSERVICE_PASSWORD: Joi.string().allow('')
+        .description('Microservice Password'),
+    ENABLE_PUSH_NOTIFICATIONS: Joi.bool()
+        .default(false),
 }).unknown()
     .required();
 
@@ -36,6 +46,11 @@ const config = {
     port: envVars.PORT,
     jwtSecret: envVars.JWT_SECRET,
     testToken: envVars.TEST_TOKEN,
+    authMicroService: envVars.AUTH_MICROSERVICE,
+    notificationMicroservice: envVars.NOTIFICATION_MICROSERVICE,
+    microserviceAccessKey: envVars.MICROSERVICE_ACCESS_KEY,
+    microservicePassword: envVars.MICROSERVICE_PASSWORD,
+    enablePushNotifications: envVars.ENABLE_PUSH_NOTIFICATIONS,
     postgres: {
         db: envVars.PG_DB,
         port: envVars.PG_PORT,

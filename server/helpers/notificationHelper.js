@@ -3,6 +3,7 @@ const Client = require('node-rest-client').Client;
 const client = new Client();
 
 function sendPushNotifications(pushData) {
+  if(!config.enablePushNotifications) return
   const authArgs = {
       headers: {"Content-Type": "application/json"},
       data: {
@@ -10,7 +11,7 @@ function sendPushNotifications(pushData) {
         password: config.microservicePassword
       }
   };
-  client.post(`${config.authMicroService}/v0/auth/login`, authArgs, function (data, response) {
+  client.post(`${config.authMicroService}/v1/auth/login`, authArgs, function (data, response) {
       const { token } = data;
       const pushNotificationArgs = {
           headers: {"Content-Type": "application/json", "Authorization":"Bearer " + token},

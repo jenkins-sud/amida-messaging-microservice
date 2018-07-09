@@ -52,6 +52,53 @@ Don't forget to commit to git!
 - [Project Jira](https://issues.mobilehealth.va.gov/projects/SUD)
 - [Project Wiki](https://wiki.mobilehealth.va.gov/display/SUD/Substance+Use+Disorder+Home)
 
+## Environment Variables (Grouped by Purpose)
+
+Note: Default values are in parenthesis.
+
+### This Server:
+
+`NODE_ENV` (`=development`)
+- When in development, set to `development`
+
+`PORT` (`=4001`) The port this server will run on.
+- When in development, by default set to `4001`, because other Amida microservices run, by default, on other `400x` ports.
+
+### This Microservice's Postgres Instance:
+
+`PG_DB` (`=amida_messaging_microservice`) Postgres database name.
+- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
+
+`PG_PORT` (`=5432`) Port on the machine the postgres instance is running on.
+
+`PG_HOST` (`=localhost`) Hostname of machine the postgres instance is running on.
+- When doing docker, set to the name of the docker container running postgres. Setting to `amida_messaging_microservice_db` is recommended.
+
+`PG_USER` (`=amida_messaging_microservice`) Postgres user that will perform operations on behalf of this microservice. Therefore, this user must have permissions to modify the database specified by `PG_DB`.
+- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
+
+`PG_PASSWD` (N/A) Password of postgres user `PG_USER`.
+
+### Running the Automated Test Suite:
+
+`TEST_TOKEN` (`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo`) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
+
+### Integration With Amida Auth Microservice:
+
+`JWT_SECRET` (`=0a6b944d-d2fb-46fc-a85e-0295c986cd9f`) Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
+- See that repo for details.
+
+`AUTH_MICROSERVICE` (`=http://localhost:4000/api`) Url of the Amida Auth Microservice API.
+
+`MICROSERVICE_ACCESS_KEY` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
+- The default value is for development only. In production, set this to a different value.
+
+`MICROSERVICE_PASSWORD` (`=@TestTest1`) The password of the user specified by `MICROSERVICE_ACCESS_KEY`.
+- In production, set to a different value.
+
+### Integration With Amida Notification Microservice
+
+`NOTIFICATION_MICROSERVICE` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
 
 ## Design
 
@@ -83,6 +130,13 @@ Merge the resulting changes to the `gh-pages` branch of the repository.
 
 ## Developing locally
 
+### Versions
+
+`yarn start` fails if your Node.js version is v10.4.1. Exactly all of the Node.js versions that fail in this way are unknown.
+
+Node.js v8.11.1 is known to work.
+
+
 Install yarn:
 ```js
 npm install -g yarn
@@ -97,6 +151,17 @@ Set environment vars:
 ```sh
 cp .env.example .env
 ```
+
+In .env, specify the enviroment variables you need.
+
+Create the database:
+
+When you `yarn start` the first time, a script will automatically create the database schema. However, this will only work if your postgres instance has:
+
+1. A database matching your `.env` file's `PG_DB` name
+2. A user matching your `.env` file's `PG_USER` name, which has sufficient permissions to modify your `PG_DB`.
+
+Therefore, in your Postgres instance, create that user and database now.
 
 Start server:
 ```sh
@@ -191,6 +256,12 @@ Docker Compose:
 ```sh
 docker-compose up
 ```
+
+### Enabling Push Notifications with the Notifications Microservice
+  - Set up and start the [Amida Notification Microservice](https://github.com/amida-tech/amida-notification-microservice)
+  - Set the `NOTIFICATION_MICROSERVICE` value in the `.env` file to the url for the notification microservice service
+  - If you haven't already, create a `microservice user` on the Auth Service with username and password matching your `MICROSERVICE_ACCESS_KEY` and `MICROSERVICE_PASSWORD` values respectively in the `.env` file. Ensure that the `MICROSERVICE_ACCESS_KEY` value matches the `MICROSERVICE_ACCESS_KEY` value in the `.env` file for the Notification Microservice.
+  - Set the `ENABLE_PUSH_NOTIFICATIONS` option to true in your `.env` file
 
 ### Kubernetes Deployment
 See the [paper](https://paper.dropbox.com/doc/Amida-Microservices-Kubernetes-Deployment-Xsz32zX8nwT9qctitGNVc) write-up for instructions on how to deploy with Kubernetes. The `kubernetes.yml` file contains the deployment definition for the project.

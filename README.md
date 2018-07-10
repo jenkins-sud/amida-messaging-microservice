@@ -162,6 +162,36 @@ gulp
 
 ## Deployment
 
+### Docker
+
+Docker deployment requires two docker containers:
+- An instance of the official Postgres docker image (see: https://hub.docker.com/_/postgres/).
+- An instance of this service's docker image (see: https://hub.docker.com/r/amidatech/messaging-service/).
+
+The Postgres container must be running _before_ the messaging-service container is started because, upon initial run, the messaging-service container defines the schema within the Postgres database.
+
+Also, the containers communicate via a docker network. Therefore,
+
+1. First, create the Docker network:
+
+```
+docker network create {DOCKER_NETWORK_NAME}
+```
+
+2. Start the postgres container:
+
+```
+docker run -d --name amida-messaging-microservice-db --network {DOCKER_NETWORK_NAME} -e POSTGRES_DB=amida_messaging_microservice -e POSTGRES_USER=amida_messaging_microservice -e POSTGRES_PASSWORD={PASSWORD} postgres:9.6
+```
+
+3. Start the messaging-service container:
+
+```
+docker run -d --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} -p 4001:4001 -e NODE_ENV=production -e PG_HOST=amida-messaging-microservice-db -e PG_DB=amida_messaging_microservice -e PG_USER=amida_messaging_microservice -e PG_PASSWD={PASSWORD} -e JWT_SECRET={JWT_SECRET} -e ENABLE_PUSH_NOTIFICATIONS=false amidatech/messaging-service
+```
+
+Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications. 
+
 ### Manual deployment with `pm2`
 ```sh
 # compile to ES5

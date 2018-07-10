@@ -33,24 +33,24 @@ Note: Default values are in parenthesis.
 
 ### Running the Automated Test Suite:
 
-`TEST_TOKEN` (`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo`) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
+`JWT_AUTOMATED_TEST_TOKEN` (`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo`) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
 
 ### Integration With Amida Auth Microservice:
 
 `JWT_SECRET` (`=0a6b944d-d2fb-46fc-a85e-0295c986cd9f`) Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
 - See that repo for details.
 
-`AUTH_MICROSERVICE_URI` (`=http://localhost:4000/api`) Url of the Amida Auth Microservice API.
+`AUTH_MICROSERVICE_URL` (`=http://localhost:4000/api`) Url of the Amida Auth Microservice API.
 
-`MICROSERVICE_ACCESS_KEY` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
+`AUTH_MICROSERVICE_SERVICE_USER_USERNAME` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
 - The default value is for development only. In production, set this to a different value.
 
-`MICROSERVICE_PASSWORD` (`=@TestTest1`) The password of the user specified by `MICROSERVICE_ACCESS_KEY`.
+`AUTH_MICROSERVICE_SERVICE_USER_PASSWORD` (`=@TestTest1`) The password of the user specified by `AUTH_MICROSERVICE_SERVICE_USER_USERNAME`.
 - In production, set to a different value.
 
 ### Integration With Amida Notification Microservice
 
-`NOTIFICATION_MICROSERVICE_URI` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
+`NOTIFICATION_MICROSERVICE_URL` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
 
 ## Design
 
@@ -126,7 +126,7 @@ DEBUG=amida-messaging-microservice:* yarn start
 
 Tests:
 
-Create a JWT with the username value 'user0' and set `TEST_TOKEN={token}` in your .env file or an evironment variable. You can easily create a token using the amida-auth-microservice
+Create a JWT with the username value 'user0' and set `JWT_AUTOMATED_TEST_TOKEN={token}` in your .env file or an evironment variable. You can easily create a token using the amida-auth-microservice
 
 ```sh
 # Run tests written in ES6
@@ -212,7 +212,7 @@ docker-compose up
 ### Enabling Push Notifications with the Notifications Microservice
   - Set up and start the [Amida Notification Microservice](https://github.com/amida-tech/amida-notification-microservice)
   - Set the `NOTIFICATION_MICROSERVICE` value in the `.env` file to the url for the notification microservice service
-  - If you haven't already, create a `microservice user` on the Auth Service with username and password matching your `MICROSERVICE_ACCESS_KEY` and `MICROSERVICE_PASSWORD` values respectively in the `.env` file. Ensure that the `MICROSERVICE_ACCESS_KEY` value matches the `MICROSERVICE_ACCESS_KEY` value in the `.env` file for the Notification Microservice.
+  - If you haven't already, create a `microservice user` on the Auth Service with username and password matching your `AUTH_MICROSERVICE_SERVICE_USER_USERNAME` and `AUTH_MICROSERVICE_SERVICE_USER_PASSWORD` values respectively in the `.env` file. Ensure that the `AUTH_MICROSERVICE_SERVICE_USER_USERNAME` value matches the `AUTH_MICROSERVICE_SERVICE_USER_USERNAME` value in the `.env` file for the Notification Microservice.
   - Set the `ENABLE_PUSH_NOTIFICATIONS` option to true in your `.env` file
 
 ### Kubernetes Deployment

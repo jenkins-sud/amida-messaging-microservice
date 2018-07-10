@@ -26,15 +26,15 @@ const envVarsSchema = Joi.object({
         .description('Enable SSL connection to PostgreSQL'),
     MESSAGING_SERVICE_PG_CERT_CA: Joi.string()
         .description('SSL certificate CA'), // Certificate itself, not a filename
-    TEST_TOKEN: Joi.string().allow('')
+    JWT_AUTOMATED_TEST_TOKEN: Joi.string().allow('')
         .description('Test auth token'),
     AUTH_MICROSERVICE_URL: Joi.string().allow('')
         .description('Auth microservice endpoint'),
     NOTIFICATION_MICROSERVICE_URL: Joi.string().allow('')
         .description('Notification Microservice endpoint'),
-    MICROSERVICE_ACCESS_KEY: Joi.string().allow('')
+    AUTH_MICROSERVICE_SERVICE_USER_USERNAME: Joi.string().allow('')
         .description('Microservice Access Key'),
-    MICROSERVICE_PASSWORD: Joi.string().allow('')
+    AUTH_MICROSERVICE_SERVICE_USER_PASSWORD: Joi.string().allow('')
         .description('Microservice Password'),
     ENABLE_PUSH_NOTIFICATIONS: Joi.bool()
         .default(false),
@@ -53,8 +53,8 @@ const config = {
     testToken: envVars.TEST_TOKEN,
     authMicroService: envVars.AUTH_MICROSERVICE_URL,
     notificationMicroservice: envVars.NOTIFICATION_MICROSERVICE_URL,
-    microserviceAccessKey: envVars.MICROSERVICE_ACCESS_KEY,
-    microservicePassword: envVars.MICROSERVICE_PASSWORD,
+    microserviceAccessKey: envVars.AUTH_MICROSERVICE_SERVICE_USER_USERNAME,
+    microservicePassword: envVars.AUTH_MICROSERVICE_SERVICE_USER_PASSWORD,
     enablePushNotifications: envVars.ENABLE_PUSH_NOTIFICATIONS,
     postgres: {
         db: envVars.MESSAGING_SERVICE_PG_DB,

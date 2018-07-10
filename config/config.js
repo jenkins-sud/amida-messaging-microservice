@@ -50,7 +50,7 @@ const config = {
     env: envVars.NODE_ENV,
     port: envVars.MESSAGING_SERVICE_PORT,
     jwtSecret: envVars.JWT_SECRET,
-    testToken: envVars.TEST_TOKEN,
+    testToken: envVars.JWT_AUTOMATED_TEST_TOKEN,
     authMicroService: envVars.AUTH_MICROSERVICE_URL,
     notificationMicroservice: envVars.NOTIFICATION_MICROSERVICE_URL,
     microserviceAccessKey: envVars.AUTH_MICROSERVICE_SERVICE_USER_USERNAME,

@@ -1,5 +1,7 @@
 import config from '../../config/config';
+
 const Client = require('node-rest-client').Client;
+
 const client = new Client();
 
 function sendPushNotifications(pushData) {
@@ -11,7 +13,7 @@ function sendPushNotifications(pushData) {
             password: config.microservicePassword,
         },
     };
-    client.post(`${config.authMicroService}/v1/auth/login`, authArgs, (data, response) => {
+    client.post(`${config.authMicroService}/auth/login`, authArgs, (data, response) => {
         const { token } = data;
         const pushNotificationArgs = {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },

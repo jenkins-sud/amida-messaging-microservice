@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         username: {
             type: DataTypes.STRING,
             allowNull: false,
-        }
+        },
     });
     // Class methods
     return User;

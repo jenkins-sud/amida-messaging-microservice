@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         lastMessageSent: {
             type: DataTypes.DATE,
             allowNull: true,
-        }
+        },
     });
     return Thread;
 };

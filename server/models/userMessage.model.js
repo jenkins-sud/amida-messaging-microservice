@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         readAt: {
             type: DataTypes.DATE,
             allowNull: true,
-        }
+        },
     });
     // Class methods
 

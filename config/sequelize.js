@@ -44,19 +44,17 @@ const UserThread = sequelize.import('../server/models/userThread.model');
 
 // Threads
 Thread.hasMany(Message);
-Thread.hasOne(Message, {as: 'LastMessage'});
-Thread.belongsToMany(User, {through: 'UserThread'});
+Thread.hasOne(Message, { as: 'LastMessage' });
+Thread.belongsToMany(User, { through: 'UserThread' });
 
 // Messages
-Message.belongsTo(Thread)
-Message.belongsTo(User, {as: 'Sender'})
-Message.belongsToMany(User, {through: 'UserMessage'});
+Message.belongsTo(Thread);
+Message.belongsTo(User, { as: 'Sender' });
+Message.belongsToMany(User, { through: 'UserMessage' });
 
 // Users
-User.belongsToMany(Thread, {through: 'UserThread'});
-User.belongsToMany(Message, {through: 'UserMessage'})
-
-
+User.belongsToMany(Thread, { through: 'UserThread' });
+User.belongsToMany(Message, { through: 'UserMessage' });
 
 
 db.Message = Message;

@@ -9,27 +9,27 @@ Note: Default values are in parenthesis.
 `NODE_ENV` (`=development`)
 - When in development, set to `development`
 
-`PORT` (`=4001`) The port this server will run on.
+`MESSAGING_SERVICE_PORT` (`=4001`) The port this server will run on.
 - When in development, by default set to `4001`, because other Amida microservices run, by default, on other `400x` ports.
 
 ### This Microservice's Postgres Instance:
 
-`PG_DB` (`=amida_messaging_microservice`) Postgres database name.
+`MESSAGING_SERVICE_PG_DB` (`=amida_messaging_microservice`) Postgres database name.
 - Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
 
-`PG_PORT` (`=5432`) Port on the machine the postgres instance is running on.
+`MESSAGING_SERVICE_PG_PORT` (`=5432`) Port on the machine the postgres instance is running on.
 
-`PG_HOST` (`=localhost`) Hostname of machine the postgres instance is running on.
+`MESSAGING_SERVICE_PG_HOST` (`=localhost`) Hostname of machine the postgres instance is running on.
 - When doing docker, set to the name of the docker container running postgres. Setting to `amida_messaging_microservice_db` is recommended.
 
-`PG_USER` (`=amida_messaging_microservice`) Postgres user that will perform operations on behalf of this microservice. Therefore, this user must have permissions to modify the database specified by `PG_DB`.
+`MESSAGING_SERVICE_PG_USER` (`=amida_messaging_microservice`) Postgres user that will perform operations on behalf of this microservice. Therefore, this user must have permissions to modify the database specified by `MESSAGING_SERVICE_PG_DB`.
 - Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
 
-`PG_PASSWD` (N/A) Password of postgres user `PG_USER`.
+`MESSAGING_SERVICE_PG_PASSWORD` (N/A) Password of postgres user `MESSAGING_SERVICE_PG_USER`.
 
-`PG_SSL` (`=false`) Whether an ssl connection shall be used to connect to postgres.
+`MESSAGING_SERVICE_PG_SSL` (`=false`) Whether an ssl connection shall be used to connect to postgres.
 
-`PG_CERT_CA` If ssl is enabled with `PG_SSL` this can be set to a certificate to override the CAs trusted while initiating the ssl connection to postgres. Without this set, Mozilla's list of trusted CAs is used. Note that this variable should contain the certificate itself, not a filename.
+`MESSAGING_SERVICE_PG_CERT_CA` If ssl is enabled with `MESSAGING_SERVICE_PG_SSL` this can be set to a certificate to override the CAs trusted while initiating the ssl connection to postgres. Without this set, Mozilla's list of trusted CAs is used. Note that this variable should contain the certificate itself, not a filename.
 
 ### Running the Automated Test Suite:
 
@@ -40,7 +40,7 @@ Note: Default values are in parenthesis.
 `JWT_SECRET` (`=0a6b944d-d2fb-46fc-a85e-0295c986cd9f`) Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
 - See that repo for details.
 
-`AUTH_MICROSERVICE` (`=http://localhost:4000/api`) Url of the Amida Auth Microservice API.
+`AUTH_MICROSERVICE_URI` (`=http://localhost:4000/api`) Url of the Amida Auth Microservice API.
 
 `MICROSERVICE_ACCESS_KEY` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
 - The default value is for development only. In production, set this to a different value.
@@ -50,7 +50,7 @@ Note: Default values are in parenthesis.
 
 ### Integration With Amida Notification Microservice
 
-`NOTIFICATION_MICROSERVICE` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
+`NOTIFICATION_MICROSERVICE_URI` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
 
 ## Design
 
@@ -110,8 +110,8 @@ Create the database:
 
 When you `yarn start` the first time, a script will automatically create the database schema. However, this will only work if your postgres instance has:
 
-1. A database matching your `.env` file's `PG_DB` name
-2. A user matching your `.env` file's `PG_USER` name, which has sufficient permissions to modify your `PG_DB`.
+1. A database matching your `.env` file's `MESSAGING_SERVICE_PG_DB` name
+2. A user matching your `.env` file's `MESSAGING_SERVICE_PG_USER` name, which has sufficient permissions to modify your `MESSAGING_SERVICE_PG_DB`.
 
 Therefore, in your Postgres instance, create that user and database now.
 
@@ -179,7 +179,7 @@ gulp
 
 ### Deployment to AWS with Packer and Terraform
 You will need to install [pakcer](https://www.packer.io/) and [terraform](https://www.terraform.io/) installed on your local machine.
-Be sure to have your postgres host running and replace the `pg_host` value in the command below with the postgres host address.
+Be sure to have your postgres host running and replace the `messaging_service_pg_host` value in the command below with the postgres host address.
 1. First validate the AMI with a command similar to ```packer validate -var 'aws_access_key=myAWSAcessKey'
 -var 'aws_secret_key=myAWSSecretKey'
 -var 'build_env=development'
@@ -188,10 +188,10 @@ Be sure to have your postgres host running and replace the `pg_host` value in th
 -var 'ami_name=api-messaging-service-boilerplate'
 -var 'node_env=development'
 -var 'jwt_secret=My-JWT-Token'
--var 'pg_host=amid-messages-packer-test.some_rand_string.us-west-2.rds.amazonaws.com'
--var 'pg_db=amida_messages'
--var 'pg_user=amida_messages'
--var 'pg_passwd=amida-messages' template.json```
+-var 'messaging_service_pg_host=amida-messages-packer-test.some_rand_string.us-west-2.rds.amazonaws.com'
+-var 'messaging_service_pg_db=amida_messages'
+-var 'messaging_service_pg_user=amida_messages'
+-var 'messaging_service_pg_password=amida-messages' template.json```
 2. If the validation from `1.` above succeeds, build the image by running the same command but replacing `validate` with `build`
 3. In the AWS console you can test the build before deployment. To do this, launch an EC2 instance with the built image and visit the health-check endpoint at <host_address>:4000/api/health-check. Be sure to launch the instance with security groups that allow http access on the app port (currently 4000) and access from Postgres port of the data base. You should see an "OK" response.
 4. Enter `aws_access_key` and `aws_secret_key` values in the vars.tf file

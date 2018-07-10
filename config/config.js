@@ -7,30 +7,30 @@ const envVarsSchema = Joi.object({
     NODE_ENV: Joi.string()
         .allow(['development', 'production', 'test', 'provision'])
         .default('development'),
-    PORT: Joi.number()
+    MESSAGING_SERVICE_PORT: Joi.number()
         .default(4001),
     JWT_SECRET: Joi.string().required()
         .description('JWT Secret required to sign'),
-    PG_DB: Joi.string().required()
+    MESSAGING_SERVICE_PG_DB: Joi.string().required()
         .description('Postgres database name'),
-    PG_PORT: Joi.number()
+    MESSAGING_SERVICE_PG_PORT: Joi.number()
         .default(5432),
-    PG_HOST: Joi.string()
+    MESSAGING_SERVICE_PG_HOST: Joi.string()
         .default('localhost'),
-    PG_USER: Joi.string().required()
+    MESSAGING_SERVICE_PG_USER: Joi.string().required()
         .description('Postgres username'),
-    PG_PASSWD: Joi.string().allow('')
+    MESSAGING_SERVICE_PG_PASSWORD: Joi.string().allow('')
         .description('Postgres password'),
-    PG_SSL: Joi.bool()
+    MESSAGING_SERVICE_PG_SSL: Joi.bool()
         .default(false)
         .description('Enable SSL connection to PostgreSQL'),
-    PG_CERT_CA: Joi.string()
+    MESSAGING_SERVICE_PG_CERT_CA: Joi.string()
         .description('SSL certificate CA'), // Certificate itself, not a filename
     TEST_TOKEN: Joi.string().allow('')
         .description('Test auth token'),
-    AUTH_MICROSERVICE: Joi.string().allow('')
+    AUTH_MICROSERVICE_URI: Joi.string().allow('')
         .description('Auth microservice endpoint'),
-    NOTIFICATION_MICROSERVICE: Joi.string().allow('')
+    NOTIFICATION_MICROSERVICE_URI: Joi.string().allow('')
         .description('Notification Microservice endpoint'),
     MICROSERVICE_ACCESS_KEY: Joi.string().allow('')
         .description('Microservice Access Key'),
@@ -48,22 +48,22 @@ if (error) {
 
 const config = {
     env: envVars.NODE_ENV,
-    port: envVars.PORT,
+    port: envVars.MESSAGING_SERVICE_PORT,
     jwtSecret: envVars.JWT_SECRET,
     testToken: envVars.TEST_TOKEN,
-    authMicroService: envVars.AUTH_MICROSERVICE,
-    notificationMicroservice: envVars.NOTIFICATION_MICROSERVICE,
+    authMicroService: envVars.AUTH_MICROSERVICE_URI,
+    notificationMicroservice: envVars.NOTIFICATION_MICROSERVICE_URI,
     microserviceAccessKey: envVars.MICROSERVICE_ACCESS_KEY,
     microservicePassword: envVars.MICROSERVICE_PASSWORD,
     enablePushNotifications: envVars.ENABLE_PUSH_NOTIFICATIONS,
     postgres: {
-        db: envVars.PG_DB,
-        port: envVars.PG_PORT,
-        host: envVars.PG_HOST,
-        user: envVars.PG_USER,
-        passwd: envVars.PG_PASSWD,
-        ssl: envVars.PG_SSL,
-        ssl_ca_cert: envVars.PG_CERT_CA,
+        db: envVars.MESSAGING_SERVICE_PG_DB,
+        port: envVars.MESSAGING_SERVICE_PG_PORT,
+        host: envVars.MESSAGING_SERVICE_PG_HOST,
+        user: envVars.MESSAGING_SERVICE_PG_USER,
+        passwd: envVars.MESSAGING_SERVICE_PG_PASSWORD,
+        ssl: envVars.MESSAGING_SERVICE_PG_SSL,
+        ssl_ca_cert: envVars.MESSAGING_SERVICE_PG_CERT_CA,
     },
 };
 

@@ -28,9 +28,9 @@ const envVarsSchema = Joi.object({
         .description('SSL certificate CA'), // Certificate itself, not a filename
     TEST_TOKEN: Joi.string().allow('')
         .description('Test auth token'),
-    AUTH_MICROSERVICE_URI: Joi.string().allow('')
+    AUTH_MICROSERVICE_URL: Joi.string().allow('')
         .description('Auth microservice endpoint'),
-    NOTIFICATION_MICROSERVICE_URI: Joi.string().allow('')
+    NOTIFICATION_MICROSERVICE_URL: Joi.string().allow('')
         .description('Notification Microservice endpoint'),
     MICROSERVICE_ACCESS_KEY: Joi.string().allow('')
         .description('Microservice Access Key'),
@@ -51,8 +51,8 @@ const config = {
     port: envVars.MESSAGING_SERVICE_PORT,
     jwtSecret: envVars.JWT_SECRET,
     testToken: envVars.TEST_TOKEN,
-    authMicroService: envVars.AUTH_MICROSERVICE_URI,
-    notificationMicroservice: envVars.NOTIFICATION_MICROSERVICE_URI,
+    authMicroService: envVars.AUTH_MICROSERVICE_URL,
+    notificationMicroservice: envVars.NOTIFICATION_MICROSERVICE_URL,
     microserviceAccessKey: envVars.MICROSERVICE_ACCESS_KEY,
     microservicePassword: envVars.MICROSERVICE_PASSWORD,
     enablePushNotifications: envVars.ENABLE_PUSH_NOTIFICATIONS,

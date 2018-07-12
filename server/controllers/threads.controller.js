@@ -19,10 +19,8 @@ function notifyUsers(users, sender, message) {
       const pushNotificationData = {
         username: user.username,
         notificationType: 'New Message',
-        data: {
-          title: `${sender.username} sent you a message`,
-          body: message.message,
-        }
+        title: `${sender.username} sent you a message`,
+        body: message.message,
       };
       pushNotificationArray.push(pushNotificationData);
     }

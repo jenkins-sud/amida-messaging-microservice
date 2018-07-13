@@ -40,7 +40,11 @@ Note: Default values are in parenthesis.
 `JWT_SECRET` (`=0a6b944d-d2fb-46fc-a85e-0295c986cd9f`) Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
 - See that repo for details.
 
-`AUTH_MICROSERVICE` (`=http://localhost:4000/api`) Url of the Amida Auth Microservice API.
+`AUTH_MICROSERVICE` (`http://localhost:4000/api`) Url of the Auth Service API.
+- In production, it is set to `https://amida-auth-microservice:4000/api`, which assumes:
+  - `amida-auth-microservice` is the name of the docker container running the Auth Service.
+  - `4000` is the port the Auth Service is running on in its container.
+  - The Auth Service's docker container and this service's docker container are a part of the same docker network.
 
 `MICROSERVICE_ACCESS_KEY` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
 - The default value is for development only. In production, set this to a different value.
@@ -50,7 +54,11 @@ Note: Default values are in parenthesis.
 
 ### Integration With Amida Notification Microservice
 
-`NOTIFICATION_MICROSERVICE` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
+`NOTIFICATION_MICROSERVICE` (`=http://localhost:4003/api`) Url of Notification Service API.
+- In production, it is set to `https://amida-notification-microservice:4000/api`, which assumes:
+  - `amida-notification-microservice` is the name of the docker container running the Notification Service.
+  - `4003` is the port the Notification Service is running on in its container.
+  - The Notification Service's docker container and this service's docker container are a part of the same docker network.
 
 ## Design
 
@@ -187,7 +195,7 @@ docker run -d --name amida-messaging-microservice-db --network {DOCKER_NETWORK_N
 3. Start the messaging-service container:
 
 ```
-docker run -d --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} -p 4001:4001 -e NODE_ENV=production -e PG_HOST=amida-messaging-microservice-db -e PG_DB=amida_messaging_microservice -e PG_USER=amida_messaging_microservice -e PG_PASSWD={PASSWORD} -e JWT_SECRET={JWT_SECRET} -e ENABLE_PUSH_NOTIFICATIONS=false amidatech/messaging-service
+docker run -d --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} -p 4001:4001 -e NODE_ENV=production -e PG_HOST=amida-messaging-microservice-db -e PG_DB=amida_messaging_microservice -e PG_USER=amida_messaging_microservice -e PG_PASSWD={PASSWORD} -e JWT_SECRET={JWT_SECRET} -e ENABLE_PUSH_NOTIFICATIONS=true -e AUTH_MICROSERVICE={AUTH_MICROSERVICE} -e NOTIFICATION_MICROSERVICE={NOTIFICATION_MICROSERVICE} amidatech/messaging-service
 ```
 
 Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications. 

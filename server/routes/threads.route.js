@@ -13,10 +13,13 @@ router.route('/')
 router.route('/')
     .get(threadsCtrl.index);
 
-router.route('/:threadId/reply')
+router.route('/thread/:threadId/reply')
     .post(threadsCtrl.reply);
 
-router.route('/:threadId')
+router.route('/thread/:threadId')
     .get(threadsCtrl.show);
+
+router.route('/thread/participants/:threadId')
+    .get(threadsCtrl.participants);
 
 export default router;

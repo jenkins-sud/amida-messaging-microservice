@@ -14,7 +14,7 @@ function startServer() {
     if (!module.parent) {
     // listen on port config.port
         app.listen(config.port, () => {
-            console.info(`server started on port ${config.port} (${config.env})`);
+            debug(`server started on port ${config.port} (${config.env})`);
         });
     }
 }
@@ -23,8 +23,8 @@ db.sequelize
   .sync()
   .then(startServer)
   .catch((err) => {
-      if (err) console.log('An error occured %j', err);
-      else console.log('Database synchronized');
+      if (err) debug('An error occured %j', err);
+      else debug('Database synchronized');
   });
 
 export default app;

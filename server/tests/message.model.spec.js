@@ -1,15 +1,14 @@
-
-/* eslint-disable */
+/* eslint-env mocha */
 
 import chai, { expect } from 'chai';
-import app from '../../index';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import chaiDateTime from 'chai-datetime';
+
 import {
     Message,
-    sequelize
 } from '../../config/sequelize';
-import _ from 'lodash';
 
-chai.use(require('chai-datetime'));
+chai.use(chaiDateTime);
 
 const testMessageObject = {
     owner: 'user1',
@@ -21,54 +20,33 @@ const testMessageObject = {
 };
 
 describe('Message Model:', () => {
+    before(() => Message.sync({ force: true }));
 
-    before(() => {
-        return Message.sync({
-            force: true
-        });
-    });
-    
-    after(() => {
-        return Message.destroy({
-            where: {},
-            truncate: true
-        });
-    });
+    // after(() => Message.destroy({truncate: true}));
 
     describe('Object creation', () => {
+        it('Create Message', () => Message
+            .create(testMessageObject)
+            .then(message => expect(message).to.exist)
+        );
 
-        it('Create Message', done => {
-            Message
-                .create(testMessageObject)
-                .then(message => {
-                    expect(message).to.exist;
-                    done();
+        it('Verify message', () => Message
+            .create(testMessageObject)
+            .then(createdMessage => Message
+                .findById(createdMessage.id)
+                .then((message) => {
+                    expect(message.owner).to.equal(testMessageObject.owner);
+                    expect(message.originalMessageId).to.be.a('null');
+                    expect(message.parentMessageId).to.be.a('null');
+                    expect(message.to).to.deep.equal(testMessageObject.to);
+                    expect(message.from).to.equal(testMessageObject.from);
+                    expect(message.subject).to.equal(testMessageObject.subject);
+                    expect(message.message).to.equal(testMessageObject.message);
+                    expect(message.createdAt).to.equalDate(testMessageObject.createdAt);
+                    expect(message.readAt).to.be.a('null');
+                    return;
                 })
-                .catch(done);
-        });
-
-        it('Verify message', done => {
-            Message
-                .create(testMessageObject)
-                .then(message => {
-                    Message
-                        .findById(message.id)
-                        .then(message => {
-                            expect(message.owner).to.equal(testMessageObject.owner);
-                            expect(message.originalMessageId).to.be.null;
-                            expect(message.parentMessageId).to.be.null;
-                            expect(message.to).to.deep.equal(testMessageObject.to);
-                            expect(message.from).to.equal(testMessageObject.from);
-                            expect(message.subject).to.equal(testMessageObject.subject);
-                            expect(message.message).to.equal(testMessageObject.message);
-                            expect(message.createdAt).to.equalDate(testMessageObject.createdAt);
-                            expect(message.readAt).to.be.null;
-                            done();
-                        });
-                })
-                .catch(done);
-        });
-
+            )
+        );
     });
-
 });

@@ -2,7 +2,7 @@ var sourceMap = require('source-map');
 var fs = require('fs');
 
 if (process.argv.length != 5) {
-	console.log('USAGE: node sourcemaptool.js /path/to/bundle.js rowNum colNum');
+	console.log('USAGE: node sourcemaptool.js /path/to/file.map.js rowNum colNum');
 	process.exit(-1);
 	
 }

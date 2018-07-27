@@ -35,7 +35,7 @@ sourceanalyzer -clean
 
 echo "=========================="
 echo "Scanning"
-sourceanalyzer -scan -f $TEMP_FILE.fpr -Xmx8092M ./dist
+sourceanalyzer -scan -f $TEMP_FILE.fpr -Xmx8092M ./dist ./index.html
 
 echo "=========================="
 echo "Merging"

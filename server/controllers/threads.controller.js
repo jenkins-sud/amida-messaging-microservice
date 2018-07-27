@@ -9,28 +9,27 @@ const Message = db.Message;
 const Thread = db.Thread;
 const User = db.User;
 const UserThread = db.UserThread;
+const sequelize = db.sequelize;
 const Op = Sequelize.Op;
 
 function notifyUsers(users, sender, message) {
-    const pushNotificationArray = [];
-    users.forEach((user) => {
-        if (user.username !== sender.username) {
-            const pushNotificationData = {
-                username: user.username,
-                notificationType: 'New Message',
-                data: {
-                    title: `${sender.username} sent you a message`,
-                    body: message.message,
-                },
-            };
-            pushNotificationArray.push(pushNotificationData);
-        }
-    });
-    notificationHelper.sendPushNotifications(pushNotificationArray);
+  const pushNotificationArray = [];
+  users.forEach((user) => {
+    if(user.username !== sender.username) {
+      const pushNotificationData = {
+        username: user.username,
+        notificationType: 'New Message',
+        title: 'New Message',
+        body: `${sender.username} sent you a message`,
+      };
+      pushNotificationArray.push(pushNotificationData);
+    }
+  });
+  notificationHelper.sendPushNotifications(pushNotificationArray);
 }
 
 /**
- * Start a new thread
+ * Start  a new thread
  * @property {Array} req.body.participants - Array of usernames to include in the thread.
  * @property {string} req.body.subject - Subject line of the message
  * @property {string} req.body.message - Body of the message
@@ -40,51 +39,91 @@ function notifyUsers(users, sender, message) {
 function create(req, res, next) {
     const { username } = req.user;
     const participants = req.body.participants;
-    const users = [];
-    const userPromises = [];
-    const date = new Date();
+    const logUser = req.body.logUser;
+    let users = [];
+    let userPromises = [];
+    let date = new Date();
+    let ThreadId = null;
+    let UserId = null;
+    let logUserId = null;
+
+    //Error message if blank array is sent to API
+    if (participants === undefined || participants.length == 0 ) {
+        const err = new APIError('There are no participants to create a thread', httpStatus.NOT_FOUND, true);
+        return next(err);
+    }
+
     participants.forEach((participant) => {
         const userPromise = User.findOrCreate({ where: { username: participant } })
       .spread((user, created) => {
-          users.push(user);
+        if(user.username === username)
+          UserId = user.id
+        if(logUser && user.username === logUser)
+          logUserId = user.id
+
+        users.push(user);
       });
         userPromises.push(userPromise);
     });
 
     Promise.all(userPromises).then(() => {
-        Thread.create({
-            topic: req.body.topic,
-            lastMessageSent: date,
-        }).then((thread) => {
-            thread.setUsers(users);
-            const sender = users.find(sender => sender.username === username);
-            Message.create({
-                from: username,
-                to: [],
-                owner: '',
-                subject: '',
-                message: req.body.message,
-                SenderId: sender.id,
-                ThreadId: thread.id,
-                LastMessageId: thread.id, // adding this while creating is okay as this is the first message in thread
-            }).then((message) => {
+      Thread.create({
+        topic: req.body.topic,
+        lastMessageSent: date,
+        logUserId
+      }).then((thread) => {
+        thread.setUsers(users);
+        const sender = users.find(sender => {
+          return sender.username === username;
+        })
+        ThreadId = thread.id
+
+        Message.create({
+          from: username,
+          to: [],
+          owner: '',
+          subject: '',
+          message: req.body.message,
+          SenderId: sender.id,
+          ThreadId: thread.id,
+          LastMessageId: thread.id //adding this while creating is okay as this is the first message in thread
+        }).then((message) => {
+
+          //Get lastMessageId added to Thread
+          Thread.update({
+            lastMessageId: message.id
+          }, {
+            where: { id: ThreadId }
+          });
+
+          UserThread.update({
+            lastMessageRead: true
+          }, {
+            where: {
+              UserId, ThreadId
+            }
+          });
+
+
           // I simply passed the LastMessageId and ThreadId properties while creating
           // the message as alternative to calling the methods below to save the extra db operation
           // thread.addMessage(message);
           // thread.setLastMessage(message); EG
-                const addUserMessagePromises = [];
-                users.forEach((user) => {
-                    const addUserMessagePromise = user.addMessage(message).then(() => {
-                    });
-                    addUserMessagePromises.push(addUserMessagePromise);
-                });
-                Promise.all(addUserMessagePromises).then(() => {
-                    notifyUsers(users, sender, message);
-                    res.send({ message });
-                });
+
+          let addUserMessagePromises = [];
+          users.forEach((user) => {
+            let addUserMessagePromise = user.addMessage(message).then(() => {
             });
-        });
-    });
+            addUserMessagePromises.push(addUserMessagePromise);
+          });
+
+          Promise.all(addUserMessagePromises).then(() => {
+            notifyUsers(users, sender, message);
+            res.send({message});
+          })
+        })
+      })
+    })
 }
 
 /**
@@ -97,39 +136,40 @@ function reply(req, res, next) {
     const date = new Date();
     Thread.findById(req.params.threadId)
     .then((thread) => {
-        if (!thread) {
-            const err = new APIError('Thread does not exist', httpStatus.NOT_FOUND, true);
-            return next(err);
-        }
-        const { username } = req.user;
-        User.findOne({ where: { username } }).then((currentUser) => {
-            Message.create({
-                from: username,
-                to: [],
-                owner: '',
-                subject: '',
-                message: req.body.message,
-                SenderId: currentUser.id, // set sender id while creating instead of doing message.setSender(currentUser) later
-            }).then((message) => {
-                thread.addMessage(message);
-                thread.setLastMessage(message);
-                thread.update({
-                    lastMessageSent: date,
-                }).then(() => {});
-                UserThread.update({
-                    lastMessageRead: false,
-                }, {
-                    where: {
-                        ThreadId: thread.id,
-                        UserId: {
-                            [Op.ne]: currentUser.id,
-                        },
-                    },
-                });
-                thread.getUsers().then((users) => {
-                    const addUserMessagePromises = [];
-                    users.forEach((user) => {
-                        const addUserMessagePromise = user.addMessage(message).then(() => {
+      if (!thread) {
+          const err = new APIError('Thread does not exist', httpStatus.NOT_FOUND, true);
+          return next(err);
+      }
+      const { username } = req.user;
+      User.findOne({where: {username}}).then(currentUser => {
+        Message.create({
+            from: username,
+            to: [],
+            owner: '',
+            subject: '',
+            message: req.body.message,
+            SenderId: currentUser.id //set sender id while creating instead of doing message.setSender(currentUser) later
+        }).then((message) => {
+          thread.addMessage(message);
+          thread.setLastMessage(message);
+          thread.update({
+            lastMessageSent: date,
+            lastMessageId: message.id
+          }).then(() => {});
+          UserThread.update({
+            lastMessageRead: false,
+          }, {
+            where: {
+              ThreadId: thread.id,
+              UserId: {
+                [Op.ne]: currentUser.id
+              }
+            }
+          });
+          thread.getUsers().then((users) => {
+            const addUserMessagePromises = [];
+            users.forEach((user) => {
+              const addUserMessagePromise = user.addMessage(message).then(() => {
 
                         });
                         addUserMessagePromises.push(addUserMessagePromise);
@@ -183,40 +223,67 @@ function show(req, res, next) {
     .catch(e => next(e));
 }
 
+
 /**
  * Returns a the current user and a list of the current user's threads
  * @returns {User}
  */
 function index(req, res, next) {
-    const { username } = req.user;
-    User.findOne({
-        where: { username },
-    })
-    .then((user) => {
-        if (!user) {
-            const err = new APIError('There are no threads for the current user', httpStatus.NOT_FOUND, true);
-            return next(err);
-        }
-        user.getThreads({
-            include: [{
-                model: Message,
-                as: 'LastMessage',
-                include: [{
-                    association: 'Sender',
-                }],
-            }],
-            order: [
-        ['lastMessageSent', 'DESC']],
-        }).then((threads) => {
-            res.send(threads);
-        });
+  const { username } = req.user;
+  const { logUsername } = req.query;
+
+
+  if( username === logUsername ) {
+    sequelize.query('SELECT * FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "Threads" as E on UserThread."ThreadId" = E."id" and (E."logUserId" = A."id" OR E."logUserId" is null ) inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id" Where A.username = :username Order By "lastMessageSent" DESC',
+      { replacements: { username: username }, type: sequelize.QueryTypes.SELECT
+    }).then(logData => {
+      if (!logData) {
+          const err = new APIError('There are no threads for the current user', httpStatus.NOT_FOUND, true);
+          return next(err);
+      }
+        res.send(logData)
     })
     .catch(e => next(e));
+  } else {
+    sequelize.query('SELECT A.*, UserThread.*, E.*, LastMessage.* FROM "Users" as A inner join "UserThreads" as UserThread on A."id" = UserThread."UserId" inner join "Threads" as E on UserThread."ThreadId" = E."id" inner join "Users" as D on E."logUserId" = D."id" inner join "Messages" as LastMessage on E."lastMessageId" = LastMessage."id"  Where A.username = :username and  D.username = :logUsername Order By "lastMessageSent" DESC',
+      { replacements: { username: username, logUsername: logUsername }, type: sequelize.QueryTypes.SELECT
+    }).then(logData => {
+      if (!logData) {
+          const err = new APIError('There are no threads for the current user', httpStatus.NOT_FOUND, true);
+          return next(err);
+      }
+        res.send(logData)
+    })
+    .catch(e => next(e));
+  }
+}
+
+//Find all users in a threadid, not including self
+function participants(req, res, next) {
+  const { username } = req.user;
+  const { threadId } = req.params;
+  User.findAll({
+    include: [{
+      model: UserThread,
+      required: true,
+      where: {
+        ThreadId: threadId,
+      }
+    }],
+    where: {
+      username: {
+        [Op.ne]: username
+      }
+    }
+  }).then(users => {
+    res.send(users)
+  })
 }
 
 export default {
     create,
     reply,
     show,
-    index,
+    participants,
+    index
 };

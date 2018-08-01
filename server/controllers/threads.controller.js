@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import db from '../../config/sequelize';
 import APIError from '../helpers/APIError';
 import Sequelize from 'sequelize';
-import notificationHelper from '../helpers/notificationHelper'
+import notificationHelper from '../helpers/notificationHelper';
 
 const Message = db.Message;
 const Thread = db.Thread;
@@ -54,7 +54,7 @@ function create(req, res, next) {
     }
 
     participants.forEach((participant) => {
-      let userPromise = User.findOrCreate({where: {username: participant}})
+        const userPromise = User.findOrCreate({ where: { username: participant } })
       .spread((user, created) => {
         if(user.username === username)
           UserId = user.id
@@ -63,7 +63,7 @@ function create(req, res, next) {
 
         users.push(user);
       });
-      userPromises.push(userPromise);
+        userPromises.push(userPromise);
     });
 
     Promise.all(userPromises).then(() => {
@@ -133,8 +133,8 @@ function create(req, res, next) {
  * @returns {Message}
  */
 function reply(req, res, next) {
-  let date = new Date();
-  Thread.findById(req.params.threadId)
+    const date = new Date();
+    Thread.findById(req.params.threadId)
     .then((thread) => {
       if (!thread) {
           const err = new APIError('Thread does not exist', httpStatus.NOT_FOUND, true);
@@ -171,16 +171,16 @@ function reply(req, res, next) {
             users.forEach((user) => {
               const addUserMessagePromise = user.addMessage(message).then(() => {
 
-              });
-              addUserMessagePromises.push(addUserMessagePromise);
+                        });
+                        addUserMessagePromises.push(addUserMessagePromise);
+                    });
+                    Promise.all(addUserMessagePromises).then(() => {
+                        notifyUsers(users, currentUser, message);
+                        res.send({ message });
+                    });
+                });
             });
-            Promise.all(addUserMessagePromises).then(() => {
-              notifyUsers(users, currentUser, message);
-              res.send({message})
-            })
-          })
-        })
-      })
+        });
     })
     .catch(e => next(e));
 }
@@ -191,34 +191,34 @@ function reply(req, res, next) {
  * @returns {[Message]}
  */
 function show(req, res, next) {
-  Thread.findById(req.params.threadId)
+    Thread.findById(req.params.threadId)
     .then((thread) => {
-      if (!thread) {
-          const err = new APIError('Thread does not exist', httpStatus.NOT_FOUND, true);
-          return next(err);
-      }
-      const { username } = req.user;
-      User.findOne({where: {username}}).then(currentUser => {
-        UserThread.update({
-          lastMessageRead: true,
-        }, {
-          where: {
-            ThreadId: thread.id,
-            UserId: currentUser.id
-          }
+        if (!thread) {
+            const err = new APIError('Thread does not exist', httpStatus.NOT_FOUND, true);
+            return next(err);
+        }
+        const { username } = req.user;
+        User.findOne({ where: { username } }).then((currentUser) => {
+            UserThread.update({
+                lastMessageRead: true,
+            }, {
+                where: {
+                    ThreadId: thread.id,
+                    UserId: currentUser.id,
+                },
+            });
         });
-      })
-      thread.getMessages({
-        include: [{
-          association: 'Sender'
-        }],
-        //Order messages here by ascending. Table assigns id in chronological order as messages are created
-        order: [
-          ['id', 'ASC']
-        ]
-        }).then(messages => {
-          res.send(messages)
-      })
+        thread.getMessages({
+            include: [{
+                association: 'Sender',
+            }],
+        // Order messages here by ascending. Table assigns id in chronological order as messages are created
+            order: [
+          ['id', 'ASC'],
+            ],
+        }).then((messages) => {
+            res.send(messages);
+        });
     })
     .catch(e => next(e));
 }

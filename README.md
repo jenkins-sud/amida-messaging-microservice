@@ -27,13 +27,13 @@ Note: Default values are in parenthesis.
 
 `MESSAGING_SERVICE_PG_PASSWORD` (N/A) Password of postgres user `MESSAGING_SERVICE_PG_USER`.
 
-`MESSAGING_SERVICE_PG_SSL` (`=false`) Whether an ssl connection shall be used to connect to postgres.
+`MESSAGING_SERVICE_PG_SSL_ENABLED` (`=false`) Whether an SSL connection shall be used to connect to postgres.
 
-`MESSAGING_SERVICE_PG_CERT_CA` If ssl is enabled with `MESSAGING_SERVICE_PG_SSL` this can be set to a certificate to override the CAs trusted while initiating the ssl connection to postgres. Without this set, Mozilla's list of trusted CAs is used. Note that this variable should contain the certificate itself, not a filename.
+`MESSAGING_SERVICE_PG_CA_CERT` If SSL is enabled with `MESSAGING_SERVICE_PG_SSL_ENABLED` this can be set to a certificate to override the CAs that are trusted while initiating the SSL connection to postgres. Without this set, Mozilla's list of trusted CAs is used. Note that this variable should contain the certificate itself, not a filename.
 
 ### Running the Automated Test Suite:
 
-`JWT_AUTOMATED_TEST_TOKEN` (`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo`) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
+`MESSAGING_SERVICE_AUTOMATED_TEST_JWT` (`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo`) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
 
 ### Integration With Amida Auth Microservice:
 
@@ -46,23 +46,19 @@ Note: Default values are in parenthesis.
   - `4000` is the port the Auth Service is running on in its container.
   - The Auth Service's docker container and this service's docker container are a part of the same docker network.
 
-`AUTH_MICROSERVICE_SERVICE_USER_USERNAME` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
+`PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
 - The default value is for development only. In production, set this to a different value.
 
-`AUTH_MICROSERVICE_SERVICE_USER_PASSWORD` (`=@TestTest1`) The password of the user specified by `AUTH_MICROSERVICE_SERVICE_USER_USERNAME`.
+`PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` (`=@TestTest1`) The password of the user specified by `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME`.
 - In production, set to a different value.
 
 ### Integration With Amida Notification Microservice
 
-<<<<<<< HEAD
 `NOTIFICATION_MICROSERVICE_URL` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
-=======
-`NOTIFICATION_MICROSERVICE_URL` (`=http://localhost:4003/api`) Url of Notification Service API.
 - In production, it is set to `https://amida-notification-microservice:4000/api`, which assumes:
   - `amida-notification-microservice` is the name of the docker container running the Notification Service.
   - `4003` is the port the Notification Service is running on in its container.
   - The Notification Service's docker container and this service's docker container are a part of the same docker network.
->>>>>>> develop
 
 ## Design
 
@@ -138,7 +134,7 @@ DEBUG=amida-messaging-microservice:* yarn start
 
 Tests:
 
-Create a JWT with the username value 'user0' and set `JWT_AUTOMATED_TEST_TOKEN={token}` in your .env file or an evironment variable. You can easily create a token using the amida-auth-microservice
+Create a JWT with the username value 'user0' and set `MESSAGING_SERVICE_AUTOMATED_TEST_JWT={token}` in your .env file or an evironment variable. You can easily create a token using the amida-auth-microservice
 
 ```sh
 # Run tests written in ES6
@@ -199,7 +195,7 @@ docker run -d --name amida-messaging-microservice-db --network {DOCKER_NETWORK_N
 3. Start the messaging-service container:
 
 ```
-docker run -d --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} -p 4001:4001 -e NODE_ENV=production -e PG_HOST=amida-messaging-microservice-db -e PG_DB=amida_messaging_microservice -e PG_USER=amida_messaging_microservice -e PG_PASSWD={PASSWORD} -e JWT_SECRET={JWT_SECRET} -e ENABLE_PUSH_NOTIFICATIONS=true -e MICROSERVICE_ACCESS_KEY={MICROSERVICE_ACCESS_KEY} -e MICROSERVICE_PASSWORD={MICROSERVICE_PASSWORD} -e AUTH_MICROSERVICE_URL={AUTH_MICROSERVICE_URL} -e NOTIFICATION_MICROSERVICE_URL={NOTIFICATION_MICROSERVICE_URL} amidatech/messaging-service
+docker run -d --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} -p 4001:4001 -e NODE_ENV=production -e PG_HOST=amida-messaging-microservice-db -e PG_DB=amida_messaging_microservice -e PG_USER=amida_messaging_microservice -e PG_PASSWD={PASSWORD} -e JWT_SECRET={JWT_SECRET} -e PUSH_NOTIFICATIONS_ENABLED=true -e MICROSERVICE_ACCESS_KEY={MICROSERVICE_ACCESS_KEY} -e MICROSERVICE_PASSWORD={MICROSERVICE_PASSWORD} -e AUTH_MICROSERVICE_URL={AUTH_MICROSERVICE_URL} -e NOTIFICATION_MICROSERVICE_URL={NOTIFICATION_MICROSERVICE_URL} amidatech/messaging-service
 ```
 
 Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications. 
@@ -254,8 +250,8 @@ docker-compose up
 ### Enabling Push Notifications with the Notifications Microservice
   - Set up and start the [Amida Notification Microservice](https://github.com/amida-tech/amida-notification-microservice)
   - Set the `NOTIFICATION_MICROSERVICE_URL` value in the `.env` file to the url for the notification microservice service
-  - If you haven't already, create a `microservice user` on the Auth Service with username and password matching your `AUTH_MICROSERVICE_SERVICE_USER_USERNAME` and `AUTH_MICROSERVICE_SERVICE_USER_PASSWORD` values respectively in the `.env` file. Ensure that the `AUTH_MICROSERVICE_SERVICE_USER_USERNAME` value matches the `AUTH_MICROSERVICE_SERVICE_USER_USERNAME` value in the `.env` file for the Notification Microservice.
-  - Set the `ENABLE_PUSH_NOTIFICATIONS` option to true in your `.env` file
+  - If you haven't already, create a `microservice user` on the Auth Service with username and password matching your `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` and `PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` values respectively in the `.env` file. Ensure that the `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` value matches the `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` value in the `.env` file for the Notification Microservice.
+  - Set the `PUSH_NOTIFICATIONS_ENABLED` option to true in your `.env` file
 
 ### Kubernetes Deployment
 See the [paper](https://paper.dropbox.com/doc/Amida-Microservices-Kubernetes-Deployment-Xsz32zX8nwT9qctitGNVc) write-up for instructions on how to deploy with Kubernetes. The `kubernetes.yml` file contains the deployment definition for the project.

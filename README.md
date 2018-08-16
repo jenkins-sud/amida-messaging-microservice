@@ -109,10 +109,8 @@ gulp
 
 Note: This is optional. It is here in its own section because it is complicated and not necessary unless you are developing/testing something that uses push notifications.
 
-  - Set up and start the [Amida Notification Microservice](https://github.com/amida-tech/amida-notification-microservice)
-  - Set the `NOTIFICATION_MICROSERVICE_URL` value in the `.env` file to the url for the notification microservice service.
-  - If you haven't already, create a "push notifications service user" on the Auth Service with username and password matching your `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` and `PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` values respectively in the `.env` file. To do so, follow the instructions in [the Orange API repo README](https://github.com/amida-tech/orange-api). Note: Your values for `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` and `PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` must match the values for these variables in the Notification Microservice.
-  - Set the `PUSH_NOTIFICATIONS_ENABLED=true`
+- Set up and start the [Amida Notification Microservice](https://github.com/amida-tech/amida-notification-microservice)
+- In your `.env` file, set the `NOTIFICATION_MICROSERVICE_URL` and push notifications -related environment variables with values matching those set in the `amida-notification-microserivce`
 
 # Deployment
 
@@ -128,13 +126,13 @@ Also, the containers communicate via a docker network. Therefore,
 
 1. First, create the Docker network:
 
-```
+```sh
 docker network create {DOCKER_NETWORK_NAME}
 ```
 
 2. Start the postgres container:
 
-```
+```sh
 docker run -d --name {MESSAGING_SERVICE_PG_HOST} --network {DOCKER_NETWORK_NAME} \
 -e POSTGRES_DB={MESSAGING_SERVICE_PG_DB} \
 -e POSTGRES_USER={MESSAGING_SERVICE_PG_USER} \
@@ -148,14 +146,12 @@ Note: To make push notifications work, follow the steps in section [Enabling Pus
 
 4. Start the messaging-service container:
 
-```
+```sh
 docker run -d -p 4001:4001 \
 --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} \
 -v {ABSOLUTE_PATH_TO_YOUR_ENV_FILE}:/app/.env:ro \
 amidatech/messaging-service
 ```
-
-Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications. 
 
 ### With docker-compose
 
@@ -217,7 +213,7 @@ Variables are listed below in this format:
 `MESSAGING_SERVICE_AUTOMATED_TEST_JWT` (Required by test scripts) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
 
 `MESSAGING_SERVICE_PG_HOST` [`localhost`] Hostname of machine the postgres instance is running on.
-- When doing docker, set to the name of the docker container running postgres. Setting to `amida-messaging-microservice-db` is recommended.
+- When using docker, set to the name of the docker container running postgres. Setting to `amida-messaging-microservice-db` is recommended.
 
 `MESSAGING_SERVICE_PG_PORT` (Required) [`5432`] Port on the machine the postgres instance is running on.
 

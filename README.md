@@ -50,7 +50,7 @@ In .env, specify the enviroment variables you need.
 
 Create the database:
 
-When you `yarn start` the first time, a script will automatically create the database schema. However, this will only work if your postgres instance has:
+When you `yarn start` the first time (see the [Development > Run](#Run) section), a script will automatically create the database schema. However, this will only work if your postgres instance has:
 
 1. A database matching your `.env` file's `MESSAGING_SERVICE_PG_DB` name
 2. A user matching your `.env` file's `MESSAGING_SERVICE_PG_USER` name, which has sufficient permissions to modify your `MESSAGING_SERVICE_PG_DB`.

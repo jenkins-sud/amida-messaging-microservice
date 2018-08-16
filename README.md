@@ -213,7 +213,17 @@ See the [paper](https://paper.dropbox.com/doc/Amida-Microservices-Kubernetes-Dep
 
 # Environment Variables
 
-Note: Default values are in parenthesis.
+Environment variables are applied in this order, with the former overwritten by the latter:
+
+1. Default values, which are set automatically by [joi](https://github.com/hapijs/joi) within `config.js`, even if no such environment variable is specified whatsoever.
+2. Variables specified by the `.env` file.
+3. Variables specified via the command line.
+
+Variables are listed below in this format:
+
+`VARIABLE_NAME` (Required (if it actually is)) [`the default value`] A description of what the variable is or does.
+- A description of what to set the variable to, whether that be an example, or what to set it to in development or production, or how to figure out how to set it, etc.
+- Perhaps another example value, etc.
 
 ## Messaging Microservice
 

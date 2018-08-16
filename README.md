@@ -1,10 +1,10 @@
 # Amida Messaging Microservice
 
-## Environment Variables (Grouped by Purpose)
+# Environment Variables
 
 Note: Default values are in parenthesis.
 
-### This Server:
+## Messaging Microservice
 
 `NODE_ENV` (`=development`)
 - When in development, set to `development`
@@ -12,15 +12,15 @@ Note: Default values are in parenthesis.
 `MESSAGING_SERVICE_PORT` (`=4001`) The port this server will run on.
 - When in development, by default set to `4001`, because other Amida microservices run, by default, on other `400x` ports.
 
-### This Microservice's Postgres Instance:
-
-`MESSAGING_SERVICE_PG_DB` (`=amida_messaging_microservice`) Postgres database name.
-- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
-
-`MESSAGING_SERVICE_PG_PORT` (`=5432`) Port on the machine the postgres instance is running on.
+`MESSAGING_SERVICE_AUTOMATED_TEST_JWT` (`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo`) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
 
 `MESSAGING_SERVICE_PG_HOST` (`=localhost`) Hostname of machine the postgres instance is running on.
 - When doing docker, set to the name of the docker container running postgres. Setting to `amida_messaging_microservice_db` is recommended.
+
+`MESSAGING_SERVICE_PG_PORT` (`=5432`) Port on the machine the postgres instance is running on.
+
+`MESSAGING_SERVICE_PG_DB` (`=amida_messaging_microservice`) Postgres database name.
+- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
 
 `MESSAGING_SERVICE_PG_USER` (`=amida_messaging_microservice`) Postgres user that will perform operations on behalf of this microservice. Therefore, this user must have permissions to modify the database specified by `MESSAGING_SERVICE_PG_DB`.
 - Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
@@ -31,14 +31,7 @@ Note: Default values are in parenthesis.
 
 `MESSAGING_SERVICE_PG_CA_CERT` If SSL is enabled with `MESSAGING_SERVICE_PG_SSL_ENABLED` this can be set to a certificate to override the CAs that are trusted while initiating the SSL connection to postgres. Without this set, Mozilla's list of trusted CAs is used. Note that this variable should contain the certificate itself, not a filename.
 
-### Running the Automated Test Suite:
-
-`MESSAGING_SERVICE_AUTOMATED_TEST_JWT` (`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo`) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
-
-### Integration With Amida Auth Microservice:
-
-`JWT_SECRET` (`=0a6b944d-d2fb-46fc-a85e-0295c986cd9f`) Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
-- See that repo for details.
+## Integration With Amida Auth Microservice
 
 `AUTH_MICROSERVICE_URL` (`http://localhost:4000/api`) Url of the Auth Service API.
 - In production, it is set to `https://amida-auth-microservice:4000/api`, which assumes:
@@ -46,13 +39,10 @@ Note: Default values are in parenthesis.
   - `4000` is the port the Auth Service is running on in its container.
   - The Auth Service's docker container and this service's docker container are a part of the same docker network.
 
-`PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
-- The default value is for development only. In production, set this to a different value.
+`JWT_SECRET` (`=0a6b944d-d2fb-46fc-a85e-0295c986cd9f`) Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
+- See that repo for details.
 
-`PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` (`=@TestTest1`) The password of the user specified by `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME`.
-- In production, set to a different value.
-
-### Integration With Amida Notification Microservice
+## Integration With Amida Notification Microservice
 
 `NOTIFICATION_MICROSERVICE_URL` (`=http://localhost:4003/api`) Url of Amida Notification Microservice API.
 - In production, it is set to `https://amida-notification-microservice:4000/api`, which assumes:
@@ -60,16 +50,24 @@ Note: Default values are in parenthesis.
   - `4003` is the port the Notification Service is running on in its container.
   - The Notification Service's docker container and this service's docker container are a part of the same docker network.
 
-## Design
+`PUSH_NOTIFICATIONS_ENABLED`
 
-### API Spec
+`PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` (`=oucuYaiN6pha3ahphiiT`) The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
+- The default value is for development only. In production, set this to a different value.
+
+`PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` (`=@TestTest1`) The password of the user specified by `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME`.
+- In production, set to a different value.
+
+# Design
+
+## API Spec
 The spec can be viewed at https://amida-tech.github.io/amida-messaging-microservice/.
 
 To update the spec, first edit the files in the `docs` directory. Then run `aglio -i docs/src/docs.md --theme flatly -o index.html`.
 
 Merge the resulting changes to the `gh-pages` branch of the repository.
 
-### Features
+## Features
 
 | Feature                                | Summary                                                                                                                                                                                                                                                     |
 |----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -88,14 +86,15 @@ Merge the resulting changes to the `gh-pages` branch of the repository.
 - Uses [http-status](https://www.npmjs.com/package/http-status) to set http status code. It is recommended to use `httpStatus.INTERNAL_SERVER_ERROR` instead of directly using `500` when setting status code.
 - Has `.editorconfig` which helps developers define and maintain consistent coding styles between different editors and IDEs.
 
-## Developing locally
+# Development
 
-### Versions
+## Versions
 
 `yarn start` fails if your Node.js version is v10.4.1. Exactly all of the Node.js versions that fail in this way are unknown.
 
 Node.js v8.11.1 is known to work.
 
+## Setup
 
 Install yarn:
 ```js
@@ -123,7 +122,8 @@ When you `yarn start` the first time, a script will automatically create the dat
 
 Therefore, in your Postgres instance, create that user and database now.
 
-Start server:
+## Run
+
 ```sh
 # Start server
 yarn start
@@ -132,7 +132,7 @@ yarn start
 DEBUG=amida-messaging-microservice:* yarn start
 ```
 
-Tests:
+## Tests
 
 Create a JWT with the username value 'user0' and set `MESSAGING_SERVICE_AUTOMATED_TEST_JWT={token}` in your .env file or an evironment variable. You can easily create a token using the amida-auth-microservice
 
@@ -150,7 +150,8 @@ yarn test:watch
 yarn test:check-coverage
 ```
 
-Lint:
+## Lint
+
 ```sh
 # Lint code with ESLint
 yarn lint
@@ -159,7 +160,8 @@ yarn lint
 yarn lint:watch
 ```
 
-Other gulp tasks:
+## Other gulp tasks
+
 ```sh
 # Wipe out dist and coverage directory
 gulp clean
@@ -168,9 +170,18 @@ gulp clean
 gulp
 ```
 
-## Deployment
+## Enabling Push Notifications with the Notifications Microservice
 
-### Docker
+Note: This is optional. It is here in its own section because it is complicated and not necessary unless you are developing/testing something that uses push notifications.
+
+  - Set up and start the [Amida Notification Microservice](https://github.com/amida-tech/amida-notification-microservice)
+  - Set the `NOTIFICATION_MICROSERVICE_URL` value in the `.env` file to the url for the notification microservice service.
+  - If you haven't already, create a "push notifications service user" on the Auth Service with username and password matching your `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` and `PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` values respectively in the `.env` file. To do so, follow the instructions in [the Orange API repo README](https://github.com/amida-tech/orange-api). Note: Your values for `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` and `PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` must match the values for these variables in the Notification Microservice.
+  - Set the `PUSH_NOTIFICATIONS_ENABLED=true`
+
+# Deployment
+
+## Deployment Via Docker
 
 Docker deployment requires two docker containers:
 - An instance of the official Postgres docker image (see: https://hub.docker.com/_/postgres/).
@@ -200,7 +211,15 @@ docker run -d --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME
 
 Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications. 
 
-### Manual deployment with `pm2`
+### With docker-compose
+
+Alternatively, there is also a docker-compose.yml file. Therefore, you can:
+
+```sh
+docker-compose up
+```
+
+## Manual deployment with `pm2`
 ```sh
 # compile to ES5
 1. yarn build
@@ -215,7 +234,7 @@ Note: If you are testing deploying this service in conjunction with other servic
 4. pm2 start dist/index.js
 ```
 
-### Deployment to AWS with Packer and Terraform
+## Deployment to AWS with Packer and Terraform
 You will need to install [pakcer](https://www.packer.io/) and [terraform](https://www.terraform.io/) installed on your local machine.
 Be sure to have your postgres host running and replace the `messaging_service_pg_host` value in the command below with the postgres host address.
 1. First validate the AMI with a command similar to ```packer validate -var 'aws_access_key=myAWSAcessKey'
@@ -237,30 +256,11 @@ Be sure to have your postgres host running and replace the `messaging_service_pg
 6. run `terraform apply` to deploy
 7. To get SNS Alarm notifications be sure that you are subscribed to SNS topic arn:aws:sns:us-west-2:844297601570:ops_team_alerts and you have confirmed subscription
 
-
-
 Further details can be found in the `deploy` directory.
 
-### Docker deployment
-Docker Compose:
-```sh
-docker-compose up
-```
-
-### Enabling Push Notifications with the Notifications Microservice
-  - Set up and start the [Amida Notification Microservice](https://github.com/amida-tech/amida-notification-microservice)
-  - Set the `NOTIFICATION_MICROSERVICE_URL` value in the `.env` file to the url for the notification microservice service
-  - If you haven't already, create a `microservice user` on the Auth Service with username and password matching your `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` and `PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` values respectively in the `.env` file. Ensure that the `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` value matches the `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` value in the `.env` file for the Notification Microservice.
-  - Set the `PUSH_NOTIFICATIONS_ENABLED` option to true in your `.env` file
-
-### Kubernetes Deployment
+## Kubernetes Deployment
 See the [paper](https://paper.dropbox.com/doc/Amida-Microservices-Kubernetes-Deployment-Xsz32zX8nwT9qctitGNVc) write-up for instructions on how to deploy with Kubernetes. The `kubernetes.yml` file contains the deployment definition for the project.
 
 ## Logging
 
 Universal logging library [winston](https://www.npmjs.com/package/winston) is used for logging. It has support for multiple transports. A transport is essentially a storage device for your logs. Each instance of a winston logger can have multiple transports configured at different levels. For example, one may want error logs to be stored in a persistent remote location (like a database), but all logs output to the console or a local file. We just log to the console for simplicity, but you can configure more transports as per your requirement.
-
-### Changelog
-
-  - 1.0.0 - Changing error format
-  - 0.3.0 - Beta

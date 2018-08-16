@@ -154,13 +154,24 @@ docker network create {DOCKER_NETWORK_NAME}
 2. Start the postgres container:
 
 ```
-docker run -d --name amida-messaging-microservice-db --network {DOCKER_NETWORK_NAME} -e POSTGRES_DB=amida_messaging_microservice -e POSTGRES_USER=amida_messaging_microservice -e POSTGRES_PASSWORD={PASSWORD} postgres:9.6
+docker run -d --name {MESSAGING_SERVICE_PG_HOST} --network {DOCKER_NETWORK_NAME} \
+-e POSTGRES_DB={MESSAGING_SERVICE_PG_DB} \
+-e POSTGRES_USER={MESSAGING_SERVICE_PG_USER} \
+-e POSTGRES_PASSWORD={MESSAGING_SERVICE_PG_PASSWORD} \
+postgres:9.6
 ```
 
-3. Start the messaging-service container:
+3. Create a `.env` file for use by this service's docker container. A good starting point is `.env.production`.
+
+Note: To make push notifications work, follow the steps in section [Enabling Push Notifications with the Notifications Microservice](#Enabling-Push-Notifications-with-the-Notifications-Microservice)
+
+4. Start the messaging-service container:
 
 ```
-docker run -d --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} -p 4001:4001 -e NODE_ENV=production -e PG_HOST=amida-messaging-microservice-db -e PG_DB=amida_messaging_microservice -e PG_USER=amida_messaging_microservice -e PG_PASSWD={PASSWORD} -e JWT_SECRET={JWT_SECRET} -e PUSH_NOTIFICATIONS_ENABLED=true -e MICROSERVICE_ACCESS_KEY={MICROSERVICE_ACCESS_KEY} -e MICROSERVICE_PASSWORD={MICROSERVICE_PASSWORD} -e AUTH_MICROSERVICE_URL={AUTH_MICROSERVICE_URL} -e NOTIFICATION_MICROSERVICE_URL={NOTIFICATION_MICROSERVICE_URL} amidatech/messaging-service
+docker run -d -p 4001:4001 \
+--name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} \
+-v {ABSOLUTE_PATH_TO_YOUR_ENV_FILE}:/app/.env:ro \
+amidatech/messaging-service
 ```
 
 Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications. 

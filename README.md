@@ -1,62 +1,11 @@
 # Amida Messaging Microservice
 
-# Environment Variables
+# Table of Contents
 
-Note: Default values are in parenthesis.
-
-## Messaging Microservice
-
-`NODE_ENV` (Required) [`development`]
-- Valid values are `development`, `production`, and `test`.
-
-`MESSAGING_SERVICE_PORT` (Required) [`4001`] The port this server will run on.
-- When in development, by default set to `4001`, because other Amida microservices run, by default, on other `400x` ports.
-
-`MESSAGING_SERVICE_AUTOMATED_TEST_JWT` (Required by test scripts) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
-
-`MESSAGING_SERVICE_PG_HOST` [`localhost`] Hostname of machine the postgres instance is running on.
-- When doing docker, set to the name of the docker container running postgres. Setting to `amida-messaging-microservice-db` is recommended.
-
-`MESSAGING_SERVICE_PG_PORT` (Required) [`5432`] Port on the machine the postgres instance is running on.
-
-`MESSAGING_SERVICE_PG_DB` Postgres database name.
-- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
-
-`MESSAGING_SERVICE_PG_USER` Postgres user that will perform operations on behalf of this microservice. Therefore, this user must have permissions to modify the database specified by `MESSAGING_SERVICE_PG_DB`.
-- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
-
-`MESSAGING_SERVICE_PG_PASSWORD` Password of postgres user `MESSAGING_SERVICE_PG_USER`.
-
-`MESSAGING_SERVICE_PG_SSL_ENABLED` [`false`] Whether an SSL connection shall be used to connect to postgres.
-
-`MESSAGING_SERVICE_PG_CA_CERT` If SSL is enabled with `MESSAGING_SERVICE_PG_SSL_ENABLED` this can be set to a certificate to override the CAs that are trusted while initiating the SSL connection to postgres. Without this set, Mozilla's list of trusted CAs is used. Note that this variable should contain the certificate itself, not a filename.
-
-## Integration With Amida Auth Microservice
-
-`AUTH_MICROSERVICE_URL` Url of the Auth Service API.
-- `.env.production` sets this to to `https://amida-auth-microservice:4000/api`, which assumes:
-  - `amida-auth-microservice` is the name of the docker container running the Auth Service.
-  - `4000` is the port the Auth Service is running on in its container.
-  - The Auth Service's docker container and this service's docker container are a part of the same docker network.
-
-`JWT_SECRET` Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
-- See [that repo](https://github.com/amida-tech/amida-auth-microservice) for details.
-
-## Integration With Amida Notification Microservice
-
-`NOTIFICATION_MICROSERVICE_URL` Url of Amida Notification Microservice API.
-- `.env.production` sets this to to `https://amida-notification-microservice:4000/api`, which assumes:
-  - `amida-notification-microservice` is the name of the docker container running the Notification Service.
-  - `4003` is the port the Notification Service is running on in its container.
-  - The Notification Service's docker container and this service's docker container are a part of the same docker network.
-
-`PUSH_NOTIFICATIONS_ENABLED` (Required) [`false`] **WARNING**: When `true`, the other push notification-related environment variables must be set correctly. Not doing so is an unsupported state that is error and crash prone.
-
-`PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
-- `.env.example` sets this to `oucuYaiN6pha3ahphiiT`, which is for development only. In production, set this to a different value.
-
-`PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` The password of the user specified by `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME`.
-- `.env.example` sets this to `@TestTest1`, which is for development only. In production, set this to a different value.
+  - [Design](#design)
+  - [Development](#development)
+  - [Deployment](#deployment)
+  - [Environment Variables](#Environment-Variables)
 
 # Design
 
@@ -250,3 +199,61 @@ Further details can be found in the `deploy` directory.
 
 ## Kubernetes Deployment
 See the [paper](https://paper.dropbox.com/doc/Amida-Microservices-Kubernetes-Deployment-Xsz32zX8nwT9qctitGNVc) write-up for instructions on how to deploy with Kubernetes. The `kubernetes.yml` file contains the deployment definition for the project.
+
+# Environment Variables
+
+Note: Default values are in parenthesis.
+
+## Messaging Microservice
+
+`NODE_ENV` (Required) [`development`]
+- Valid values are `development`, `production`, and `test`.
+
+`MESSAGING_SERVICE_PORT` (Required) [`4001`] The port this server will run on.
+- When in development, by default set to `4001`, because other Amida microservices run, by default, on other `400x` ports.
+
+`MESSAGING_SERVICE_AUTOMATED_TEST_JWT` (Required by test scripts) This is the `amida-auth-microservice` JWT that is used by this repo's automated test suite when it makes requests.
+
+`MESSAGING_SERVICE_PG_HOST` [`localhost`] Hostname of machine the postgres instance is running on.
+- When doing docker, set to the name of the docker container running postgres. Setting to `amida-messaging-microservice-db` is recommended.
+
+`MESSAGING_SERVICE_PG_PORT` (Required) [`5432`] Port on the machine the postgres instance is running on.
+
+`MESSAGING_SERVICE_PG_DB` Postgres database name.
+- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
+
+`MESSAGING_SERVICE_PG_USER` Postgres user that will perform operations on behalf of this microservice. Therefore, this user must have permissions to modify the database specified by `MESSAGING_SERVICE_PG_DB`.
+- Setting to `amida_messaging_microservice` is recommended because 3rd parties could be running Amida services using their Postgres instances--which is why the name begins with `amida_`.
+
+`MESSAGING_SERVICE_PG_PASSWORD` Password of postgres user `MESSAGING_SERVICE_PG_USER`.
+
+`MESSAGING_SERVICE_PG_SSL_ENABLED` [`false`] Whether an SSL connection shall be used to connect to postgres.
+
+`MESSAGING_SERVICE_PG_CA_CERT` If SSL is enabled with `MESSAGING_SERVICE_PG_SSL_ENABLED` this can be set to a certificate to override the CAs that are trusted while initiating the SSL connection to postgres. Without this set, Mozilla's list of trusted CAs is used. Note that this variable should contain the certificate itself, not a filename.
+
+## Integration With Amida Auth Microservice
+
+`AUTH_MICROSERVICE_URL` Url of the Auth Service API.
+- `.env.production` sets this to to `https://amida-auth-microservice:4000/api`, which assumes:
+  - `amida-auth-microservice` is the name of the docker container running the Auth Service.
+  - `4000` is the port the Auth Service is running on in its container.
+  - The Auth Service's docker container and this service's docker container are a part of the same docker network.
+
+`JWT_SECRET` Must match value of the JWT secret being used by your `amida-auth-microservice` instance.
+- See [that repo](https://github.com/amida-tech/amida-auth-microservice) for details.
+
+## Integration With Amida Notification Microservice
+
+`NOTIFICATION_MICROSERVICE_URL` Url of Amida Notification Microservice API.
+- `.env.production` sets this to to `https://amida-notification-microservice:4000/api`, which assumes:
+  - `amida-notification-microservice` is the name of the docker container running the Notification Service.
+  - `4003` is the port the Notification Service is running on in its container.
+  - The Notification Service's docker container and this service's docker container are a part of the same docker network.
+
+`PUSH_NOTIFICATIONS_ENABLED` (Required) [`false`] **WARNING**: When `true`, the other push notification-related environment variables must be set correctly. Not doing so is an unsupported state that is error and crash prone.
+
+`PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME` The username of the service user that authenticates against `amida-auth-microservice` and performs requests against the `amida-notification-microservice` API.
+- `.env.example` sets this to `oucuYaiN6pha3ahphiiT`, which is for development only. In production, set this to a different value.
+
+`PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD` The password of the user specified by `PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME`.
+- `.env.example` sets this to `@TestTest1`, which is for development only. In production, set this to a different value.

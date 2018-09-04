@@ -118,6 +118,7 @@ yarn
 Set environment vars:
 ```sh
 cp .env.example .env
+cp .env .env.test
 ```
 
 In .env, specify the enviroment variables you need.
@@ -146,6 +147,7 @@ Create a JWT with the username value 'user0' and set `JWT_AUTOMATED_TEST_TOKEN={
 
 ```sh
 # Run tests written in ES6
+# Make sure .env.test exists
 yarn test
 
 # Run test along with code coverage
@@ -206,7 +208,7 @@ docker run -d --name amida-messaging-microservice-db --network {DOCKER_NETWORK_N
 docker run -d --name amida-messaging-microservice --network {DOCKER_NETWORK_NAME} -p 4001:4001 -e NODE_ENV=production -e PG_HOST=amida-messaging-microservice-db -e PG_DB=amida_messaging_microservice -e PG_USER=amida_messaging_microservice -e PG_PASSWD={PASSWORD} -e JWT_SECRET={JWT_SECRET} -e ENABLE_PUSH_NOTIFICATIONS=true -e MICROSERVICE_ACCESS_KEY={MICROSERVICE_ACCESS_KEY} -e MICROSERVICE_PASSWORD={MICROSERVICE_PASSWORD} -e AUTH_MICROSERVICE={AUTH_MICROSERVICE} -e NOTIFICATION_MICROSERVICE={NOTIFICATION_MICROSERVICE} amidatech/messaging-service
 ```
 
-Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications. 
+Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications.
 
 ### Manual deployment with `pm2`
 ```sh

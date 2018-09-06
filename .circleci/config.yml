@@ -17,7 +17,7 @@ jobs:
         - MESSAGING_SERVICE_PG_HOST: 127.0.0.1
         - MESSAGING_SERVICE_PG_USER: messaging
         - MESSAGING_SERVICE_PG_PASSWORD: postgres
-        - JWT_AUTOMATED_TEST_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo
+        - MESSAGING_SERVICE_AUTOMATED_TEST_JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIwIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiYWRtaW4iOnRydWV9.X_SzIXZ-oqEL67eB-fwFqFSumuFQVAqhgsmak1JLIWo
       - image: circleci/postgres:9.6.2-alpine
         environment:
         - POSTGRES_USER: messaging

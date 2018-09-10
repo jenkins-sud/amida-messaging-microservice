@@ -11,10 +11,20 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             primaryKey: true,
         },
+        uuid: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+        },
         username: {
             type: DataTypes.STRING,
             allowNull: false,
         },
+    }, {
+        indexes: [
+            {
+                fields: ['uuid'],
+            },
+        ],
     });
     // Class methods
     return User;

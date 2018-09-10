@@ -11,7 +11,7 @@
     "yarn": ">=0.20.3"
   },
   "scripts": {
-    "start": "gulp serve",
+    "start": "./node_modules/.bin/sequelize db:migrate && gulp serve",
     "start:debug": "cross-env DEBUG=amida-messaging-microservice:* yarn start",
     "build": "gulp",
     "lint": "esw -c .eslintrc *.js server config . --color --fix",
@@ -55,8 +55,10 @@
     "passport-jwt": "3.0.1",
     "pg": "6.1.6",
     "pg-hstore": "2.3.2",
+    "request": "false2.88.0",
     "run-sequence": "^1.1.5",
     "sequelize": "^4.28.6",
+    "sequelize-cli": "false4.1.1",
     "snyk": "^1.69.4",
     "supertest": "^3.0.0",
     "supertest-as-promised": "4.0.2",

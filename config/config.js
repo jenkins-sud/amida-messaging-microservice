@@ -1,4 +1,4 @@
-import Joi from 'joi';
+const Joi = require('joi');
 // require and configure dotenv, will load vars in .env in PROCESS.ENV
 require('dotenv').config();
 
@@ -23,12 +23,13 @@ const envVarsSchema = Joi.object({
     MESSAGING_SERVICE_PG_SSL_ENABLED: Joi.bool()
         .default(false)
         .description('Enable SSL connection to PostgreSQL'),
-    MESSAGING_SERVICE_PG_CA_CERT: Joi.string()
+    MESSAGING_SERVICE_PG_CA_CERT: Joi.string().allow('')
         .description('SSL certificate CA. This string must be the certificate itself, not a filename.'),
     MESSAGING_SERVICE_AUTOMATED_TEST_JWT: Joi.string().allow('')
         .description('Test auth token'),
     AUTH_MICROSERVICE_URL: Joi.string().allow('')
-        .description('Auth microservice endpoint'),
+        .description('Auth microservice endpoint')
+        .default('http://localhost:4000/api/v1'),
     NOTIFICATION_MICROSERVICE_URL: Joi.string().allow('')
         .description('Notification Microservice endpoint'),
     PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME: Joi.string().allow('')
@@ -45,7 +46,7 @@ if (error) {
     throw new Error(`Config validation error: ${error.message}`);
 }
 
-const config = {
+module.exports = {
     env: envVars.NODE_ENV,
     port: envVars.MESSAGING_SERVICE_PORT,
     jwtSecret: envVars.JWT_SECRET,
@@ -64,6 +65,19 @@ const config = {
         sslEnabled: envVars.MESSAGING_SERVICE_PG_SSL_ENABLED,
         sslCaCert: envVars.MESSAGING_SERVICE_PG_CA_CERT,
     },
+    development: {
+        username: envVars.MESSAGING_SERVICE_PG_USER,
+        password: envVars.MESSAGING_SERVICE_PG_PASSWORD,
+        port: envVars.MESSAGING_SERVICE_PG_PORT,
+        database: envVars.MESSAGING_SERVICE_PG_DB,
+        host: envVars.MESSAGING_SERVICE_PG_HOST,
+        dialect: 'postgres',
+        migrationStorageTableName: 'sequelize_meta',
+        logging: true,
+        // dialectOptions: {
+        //   ssl: {
+        //     ca: fs.readFileSync(__dirname + '/mysql-ca-master.crt')
+        //   }
+        // }
+    },
 };
-
-export default config;

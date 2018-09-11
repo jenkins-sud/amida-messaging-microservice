@@ -5,7 +5,7 @@ const Client = require('node-rest-client').Client;
 const client = new Client();
 
 function sendPushNotifications(pushData) {
-    if (!config.enablePushNotifications) return;
+    if (!config.pushNotificationsEnabled) return;
     const authArgs = {
         headers: { 'Content-Type': 'application/json' },
         data: {

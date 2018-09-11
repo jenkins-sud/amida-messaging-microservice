@@ -21,28 +21,27 @@ const envVarsSchema = Joi.object({
         .description('Postgres database name'),
     MESSAGING_SERVICE_PG_PORT: Joi.number()
         .default(5432),
-    MESSAGING_SERVICE_PG_HOST: Joi.string()
-        .default('localhost'),
+    MESSAGING_SERVICE_PG_HOST: Joi.string(),
     MESSAGING_SERVICE_PG_USER: Joi.string().required()
         .description('Postgres username'),
     MESSAGING_SERVICE_PG_PASSWORD: Joi.string().allow('')
         .description('Postgres password'),
-    MESSAGING_SERVICE_PG_SSL: Joi.bool()
+    MESSAGING_SERVICE_PG_SSL_ENABLED: Joi.bool()
         .default(false)
         .description('Enable SSL connection to PostgreSQL'),
-    MESSAGING_SERVICE_PG_CERT_CA: Joi.string()
-        .description('SSL certificate CA'), // Certificate itself, not a filename
-    JWT_AUTOMATED_TEST_TOKEN: Joi.string().allow('')
+    MESSAGING_SERVICE_PG_CA_CERT: Joi.string()
+        .description('SSL certificate CA. This string must be the certificate itself, not a filename.'),
+    MESSAGING_SERVICE_AUTOMATED_TEST_JWT: Joi.string().allow('')
         .description('Test auth token'),
     AUTH_MICROSERVICE_URL: Joi.string().allow('')
         .description('Auth microservice endpoint'),
     NOTIFICATION_MICROSERVICE_URL: Joi.string().allow('')
         .description('Notification Microservice endpoint'),
-    AUTH_MICROSERVICE_SERVICE_USER_USERNAME: Joi.string().allow('')
+    PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME: Joi.string().allow('')
         .description('Microservice Access Key'),
-    AUTH_MICROSERVICE_SERVICE_USER_PASSWORD: Joi.string().allow('')
+    PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD: Joi.string().allow('')
         .description('Microservice Password'),
-    ENABLE_PUSH_NOTIFICATIONS: Joi.bool()
+    PUSH_NOTIFICATIONS_ENABLED: Joi.bool()
         .default(false),
 }).unknown()
     .required();
@@ -56,20 +55,20 @@ const config = {
     env: envVars.NODE_ENV,
     port: envVars.MESSAGING_SERVICE_PORT,
     jwtSecret: envVars.JWT_SECRET,
-    testToken: envVars.JWT_AUTOMATED_TEST_TOKEN,
+    testToken: envVars.MESSAGING_SERVICE_AUTOMATED_TEST_JWT,
     authMicroService: envVars.AUTH_MICROSERVICE_URL,
     notificationMicroservice: envVars.NOTIFICATION_MICROSERVICE_URL,
-    microserviceAccessKey: envVars.AUTH_MICROSERVICE_SERVICE_USER_USERNAME,
-    microservicePassword: envVars.AUTH_MICROSERVICE_SERVICE_USER_PASSWORD,
-    enablePushNotifications: envVars.ENABLE_PUSH_NOTIFICATIONS,
+    microserviceAccessKey: envVars.PUSH_NOTIFICATIONS_SERVICE_USER_USERNAME,
+    microservicePassword: envVars.PUSH_NOTIFICATIONS_SERVICE_USER_PASSWORD,
+    pushNotificationsEnabled: envVars.PUSH_NOTIFICATIONS_ENABLED,
     postgres: {
         db: envVars.MESSAGING_SERVICE_PG_DB,
         port: envVars.MESSAGING_SERVICE_PG_PORT,
         host: envVars.MESSAGING_SERVICE_PG_HOST,
         user: envVars.MESSAGING_SERVICE_PG_USER,
         passwd: envVars.MESSAGING_SERVICE_PG_PASSWORD,
-        ssl: envVars.MESSAGING_SERVICE_PG_SSL,
-        ssl_ca_cert: envVars.MESSAGING_SERVICE_PG_CERT_CA,
+        sslEnabled: envVars.MESSAGING_SERVICE_PG_SSL_ENABLED,
+        sslCaCert: envVars.MESSAGING_SERVICE_PG_CA_CERT,
     },
 };
 

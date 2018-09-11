@@ -1,0 +1,33 @@
+version: '2'
+
+networks:
+  default:
+    external:
+      name: nextgen-svcs
+
+services:
+  amida-messaging-microservice:
+    build:
+      context: .
+    image: ${DTR_PREFIX}${DTR_ORG}/amida-messaging-microservice:${SOURCE_BUILD_NUMBER}
+    # Expose ports [HOST:CONTAINER}
+    ports:
+      - "4001"
+
+    # Set environment variables from this file
+    env_file:
+      - .env
+
+    # Overwrite any env var defined in .env file (if required)
+    environment:
+      - MESSAGING_SERVICE_G_DB=api
+      - MESSAGING_SERVICE_PG_PORT=5432
+      - MESSAGING_SERVICE_PG_HOST=postgres
+      - MESSAGING_SERVICE_PG_USER=api
+      - MESSAGING_SERVICE_PG_PASSWORD=boilerplate
+      - DEBUG=amida-api-boilerplate:*
+      - MESSAGING_SERVICE_PORT=4001
+
+    # Link to containers in another service.
+    # Links also express dependency between services in the same way as depends_on,
+    # so they determine the order of service startup.

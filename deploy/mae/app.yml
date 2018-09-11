@@ -1,0 +1,69 @@
+# Note: 
+# Comments are allowed in yml files; however,
+# you can remove all comments from this file with the following command:
+#
+# mv app.yml template.yml;grep -v "#" template.yml > app.yml;rm template.yml
+#
+- project:
+###### VALIDATE VERSION TO USE ######
+   automationVersion: 3.0.0
+#
+#####################################
+######## BEGIN ALWAYS UPDATE ########
+   # Match Stash Repo Name, Lower Case
+   name: amida-messaging-microservice
+   #
+   # Match Stash Project Name, Lower Case
+   nexusRepository: sud
+   #
+   # Must have an environment file, but may be empty.
+   # Advanced projects may use veteran.env and/or staff.env
+   environmentFile: app.env
+######## END ALWAYS UPDATE   ########
+#####################################
+#
+# BEGIN DO NOT CHANGE 
+   nexusGroupId: $NEXUS_GROUP_ID
+   nexusArtifactId: $JOB_NAME
+   nexusFile: $JOB_NAME-$BUILD_NUMBER.tar.gz
+   nexusURL: $NEXUS_URL
+   nexusProtocol: http
+   nexusPackaging: tar.gz
+   startingpath: $STARTING_PATH
+   ucp-host: $UCP_HOST
+   dtrhost: $DTR_HOST
+   dtrorganization: $DTR_ORG
+   jobs:
+      - '{name}-app-build':
+# END DO NOT CHANGE
+#
+      #####################################
+      ######## BEGIN ALWAYS UPDATE ########
+          # Match Stash Repo and Project Name, Lower Case
+          gitrepo: '$STASH_URL/amida-messaging-microservice'
+          # Defines branch to use for this deployment
+          gitbranch: develop
+      ######## END ALWAYS UPDATE   ########
+      ##################################### 
+      #
+      # BEGIN ADVANCED CHANGES
+          gitsubmodules: false
+          compileline: ./deploy/mae/build.sh
+          scanline: if [ -f fortify.sh ]; then chmod 755 fortify.sh; ./fortify.sh; fi         
+          packageline: if [ -f package.sh ]; then chmod 755 package.sh; ./package.sh; fi
+      # END ADVANCED CHANGES
+      #
+      # BEGIN DO NOT CHANGE           
+          jenkinsnode: image-build
+          gitcreds: STASH_USER
+      - '{name}-docker-image-build':
+          jenkinsnode: image-build
+          nexusPath: "/service/local/repositories/{nexusRepository}/content/{nexusGroupId}/"
+      - '{name}-docker-image-deploy':
+          jenkinsnode: image-deploy      
+      # END DO NOT CHANGE
+      #
+      # BEGIN ADVANCED CHANGES
+          predeployline: if [ -f pre-deploy.sh ]; then chmod 755 pre-deploy.sh; ./pre-deploy.sh; fi         
+          postdeployline: if [ -f post-deploy.sh ]; then chmod 755 post-deploy.sh; ./post-deploy.sh; fi
+      # END ADVANCED CHANGES      

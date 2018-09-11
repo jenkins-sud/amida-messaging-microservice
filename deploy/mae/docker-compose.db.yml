@@ -1,0 +1,15 @@
+version: '2'
+
+networks:
+  default:
+    external:
+      name: nextgen-svcs
+
+services:
+  postgres:
+    image: "postgres:9.4.11"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=api
+      - POSTGRES_PASSWORD=boilerplate

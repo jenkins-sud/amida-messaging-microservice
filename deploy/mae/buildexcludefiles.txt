@@ -1,7 +1,5 @@
 deploy
 node_modules
-tarexcludelist.txt
-tarincludelist.txt
 Dockerfile
 app.env
 app.yml

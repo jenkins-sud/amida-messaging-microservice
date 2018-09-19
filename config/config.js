@@ -66,7 +66,7 @@ const config = {
         port: envVars.MESSAGING_SERVICE_PG_PORT,
         host: envVars.MESSAGING_SERVICE_PG_HOST,
         user: envVars.MESSAGING_SERVICE_PG_USER,
-        passwd: envVars.MESSAGING_SERVICE_PG_PASSWORD,
+        password: envVars.MESSAGING_SERVICE_PG_PASSWORD,
         sslEnabled: envVars.MESSAGING_SERVICE_PG_SSL_ENABLED,
         sslCaCert: envVars.MESSAGING_SERVICE_PG_CA_CERT,
     },

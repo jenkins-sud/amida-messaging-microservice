@@ -1,6 +1,12 @@
 import Joi from 'joi';
 // require and configure dotenv, will load vars in .env in PROCESS.ENV
-require('dotenv').config();
+const dotenv = require('dotenv');
+if (process.env.NODE_ENV === 'test') {
+    console.log('using env.test');
+    dotenv.config({ path: '.env.test' });
+} else {
+    dotenv.config();
+}
 
 // define validation for all the env vars
 const envVarsSchema = Joi.object({
@@ -60,7 +66,7 @@ const config = {
         port: envVars.MESSAGING_SERVICE_PG_PORT,
         host: envVars.MESSAGING_SERVICE_PG_HOST,
         user: envVars.MESSAGING_SERVICE_PG_USER,
-        passwd: envVars.MESSAGING_SERVICE_PG_PASSWORD,
+        password: envVars.MESSAGING_SERVICE_PG_PASSWORD,
         sslEnabled: envVars.MESSAGING_SERVICE_PG_SSL_ENABLED,
         sslCaCert: envVars.MESSAGING_SERVICE_PG_CA_CERT,
     },

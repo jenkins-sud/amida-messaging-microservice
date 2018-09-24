@@ -44,6 +44,7 @@ yarn
 Set environment vars:
 ```sh
 cp .env.example .env
+cp .env .env.test
 ```
 
 In .env, specify the enviroment variables you need.
@@ -73,6 +74,7 @@ Create a JWT with the username value 'user0' and set `MESSAGING_SERVICE_AUTOMATE
 
 ```sh
 # Run tests written in ES6
+# Make sure .env.test exists
 yarn test
 
 # Run test along with code coverage
@@ -144,7 +146,7 @@ postgres:9.6
 
 Note: To make push notifications work, follow the steps in section [Enabling Push Notifications with the Notifications Microservice](#Enabling-Push-Notifications-with-the-Notifications-Microservice)
 
-4. Start the messaging-service container:
+Note: If you are testing deploying this service in conjunction with other services or to connect to a specific front-end client it is vital that the JWT_SECRET environment variables match up between the different applications.
 
 ```sh
 docker run -d -p 4001:4001 \

@@ -297,7 +297,6 @@ describe('Message API:', () => {
         before(() => Message
             .destroy({
                 where: {},
-                truncate: true,
             }).then(() => Message
                 .bulkCreate(testMessageArray)
                 .then((messages) => {
@@ -310,7 +309,6 @@ describe('Message API:', () => {
         after(() => Message
             .destroy({
                 where: {},
-                truncate: true,
             })
         );
 
@@ -583,7 +581,6 @@ describe('Message API:', () => {
         beforeEach(() => Message
             .destroy({
                 where: {},
-                truncate: true,
             }).then(() => request(app)
                 .post(`${baseURL}/message/send`)
                 .set('Authorization', `Bearer ${auth}`)
@@ -631,7 +628,6 @@ describe('Message API:', () => {
         before(() => Message
                       .destroy({
                           where: {},
-                          truncate: true,
                       }).then(() => request(app)
                 .post(`${baseURL}/message/send`)
                 .set('Authorization', `Bearer ${auth}`)
@@ -713,7 +709,6 @@ describe('Message API:', () => {
         after(() => Message
             .destroy({
                 where: {},
-                truncate: true,
             })
         );
     });
@@ -724,7 +719,6 @@ describe('Message API:', () => {
         before(() => Message
                       .destroy({
                           where: {},
-                          truncate: true,
                       }).then(() => request(app)
                 .post(`${baseURL}/message/send`)
                 .set('Authorization', `Bearer ${auth}`)
@@ -762,7 +756,6 @@ describe('Message API:', () => {
         before(() => Message
                       .destroy({
                           where: {},
-                          truncate: true,
                       }).then(() => request(app)
                 .post(`${baseURL}/message/send`)
                 .set('Authorization', `Bearer ${auth}`)

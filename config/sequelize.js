@@ -32,7 +32,7 @@ if (config.postgres.sslEnabled) {
 const sequelize = new Sequelize(
     config.postgres.db,
     config.postgres.user,
-    config.postgres.passwd,
+    config.postgres.password,
     sequelizeOptions
 );
 
@@ -53,8 +53,8 @@ Message.belongsTo(User, { as: 'Sender' });
 Message.belongsToMany(User, { through: 'UserMessage' });
 
 // Users
-User.belongsToMany(Thread, {through: 'UserThread'});
-User.belongsToMany(Message, {through: 'UserMessage'})
+User.belongsToMany(Thread, { through: 'UserThread' });
+User.belongsToMany(Message, { through: 'UserMessage' });
 
 User.hasMany(UserThread);
 
@@ -65,7 +65,8 @@ db.User = User;
 db.UserMessage = UserMessage;
 db.UserThread = UserThread;
 
-//Run sql command to add new column, update lastMessageId column for those who are using Messaging API already
+// Run sql command to add new column, update lastMessageId column for those who are using Messaging API already
+// eslint-disable-next-line no-unused-vars
 sequelize.query('ALTER TABLE "UserThreads" DROP COLUMN IF EXISTS "isLog"; ALTER TABLE "Threads" ADD COLUMN IF NOT EXISTS "logUserId" integer DEFAULT NULL; ALTER TABLE "Threads" ADD COLUMN IF NOT EXISTS "lastMessageId" INTEGER; UPDATE "Threads" T1 SET "lastMessageId" = T2."MessageId" FROM ( SELECT max(id) "MessageId", "ThreadId" FROM "Messages" Group By "ThreadId" ) T2 WHERE T1."id" = T2."ThreadId" and "lastMessageId" is null;');
 
 

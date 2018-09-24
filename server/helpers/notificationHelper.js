@@ -13,13 +13,15 @@ function sendPushNotifications(pushData) {
             password: config.microservicePassword,
         },
     };
+    // eslint-disable-next-line no-unused-vars
     client.post(`${config.authMicroService}/auth/login`, authArgs, (data, response) => {
         const { token } = data;
         const pushNotificationArgs = {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             data: { pushData },
         };
-        client.post(`${config.notificationMicroservice}/notifications/sendPushNotifications`, pushNotificationArgs, (data, response) => {
+        // eslint-disable-next-line no-unused-vars
+        client.post(`${config.notificationMicroservice}/notifications/sendPushNotifications`, pushNotificationArgs, (_data, response) => {
         });
     });
 }

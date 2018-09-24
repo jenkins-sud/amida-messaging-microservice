@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         logUserId: {
             type: DataTypes.INTEGER,
             allowNull: true,
-        }
+        },
     });
     return Thread;
 };

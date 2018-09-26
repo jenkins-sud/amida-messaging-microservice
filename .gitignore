@@ -50,3 +50,6 @@ node_modules
 # .env
 .env
 .env.test
+
+# build dir
+build
